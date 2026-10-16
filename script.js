@@ -1,6 +1,5 @@
 /* ============================================
-   AVR PRO STUDIOS — ULTRA v4.0
-   AI + 30 Filters + Effects + Mobile + Live Logo
+   AVR PRO STUDIOS — v6.0 FINAL
    ============================================ */
 
 window.addEventListener('load', () => {
@@ -10,7 +9,6 @@ window.addEventListener('load', () => {
   }, 3200);
 });
 
-// ---------- State ----------
 const state = {
   filters: {
     exposure: 0, brightness: 100, contrast: 100, highlights: 0, shadows: 0, whites: 0, blacks: 0,
@@ -28,10 +26,8 @@ const state = {
   cropping: false
 };
 
-// ---------- 40+ FILTERS with Categories ----------
 const FILTERS = {
   original: { css: '', cat: 'all' },
-  // Cinematic
   teal: { css: 'contrast(1.15) saturate(1.1) hue-rotate(-15deg)', cat: 'cinematic' },
   orange: { css: 'contrast(1.1) saturate(1.2) sepia(0.15)', cat: 'cinematic' },
   blockbuster: { css: 'contrast(1.3) saturate(1.15) hue-rotate(-10deg) brightness(0.95)', cat: 'cinematic' },
@@ -39,7 +35,6 @@ const FILTERS = {
   moody: { css: 'contrast(1.25) brightness(0.85) saturate(0.85)', cat: 'cinematic' },
   netflix: { css: 'contrast(1.2) saturate(1.1) brightness(0.92) hue-rotate(-5deg)', cat: 'cinematic' },
   hollywood: { css: 'contrast(1.15) saturate(1.15) sepia(0.1)', cat: 'cinematic' },
-  // Vintage
   vintage: { css: 'sepia(0.4) contrast(1.1) brightness(0.95)', cat: 'vintage' },
   retro: { css: 'sepia(0.6) contrast(1.15) saturate(0.8)', cat: 'vintage' },
   oldFilm: { css: 'sepia(0.7) contrast(1.2) brightness(0.9) saturate(0.7)', cat: 'vintage' },
@@ -48,7 +43,6 @@ const FILTERS = {
   polaroid: { css: 'sepia(0.25) contrast(1.15) brightness(1.05)', cat: 'vintage' },
   kodak: { css: 'saturate(1.3) contrast(1.1) sepia(0.15)', cat: 'vintage' },
   lomo: { css: 'contrast(1.3) saturate(1.5) hue-rotate(-5deg)', cat: 'vintage' },
-  // Modern
   vivid: { css: 'saturate(1.8) contrast(1.2)', cat: 'modern' },
   hdr: { css: 'contrast(1.3) saturate(1.4) brightness(1.05)', cat: 'modern' },
   dramatic: { css: 'contrast(1.5) brightness(0.9) saturate(0.8)', cat: 'modern' },
@@ -60,19 +54,15 @@ const FILTERS = {
   sunset: { css: 'sepia(0.5) saturate(1.6) hue-rotate(-20deg)', cat: 'modern' },
   goldenHour: { css: 'sepia(0.3) saturate(1.4) brightness(1.05) hue-rotate(-15deg)', cat: 'modern' },
   moonlight: { css: 'hue-rotate(200deg) brightness(0.9) saturate(0.9)', cat: 'modern' },
-  // B&W
   bw: { css: 'grayscale(1) contrast(1.2)', cat: 'bw' },
   noir: { css: 'grayscale(1) contrast(1.5) brightness(0.9)', cat: 'bw' },
   highKey: { css: 'grayscale(1) brightness(1.3) contrast(0.9)', cat: 'bw' },
   lowKey: { css: 'grayscale(1) brightness(0.7) contrast(1.4)', cat: 'bw' },
   silvertone: { css: 'grayscale(0.9) contrast(1.1) sepia(0.15)', cat: 'bw' },
-  // Neon
   neonPink: { css: 'hue-rotate(-60deg) saturate(2) contrast(1.2) brightness(1.1)', cat: 'neon' },
   neonBlue: { css: 'hue-rotate(180deg) saturate(2.5) contrast(1.3)', cat: 'neon' },
   neonPurple: { css: 'hue-rotate(250deg) saturate(2) contrast(1.2)', cat: 'neon' },
   neonGreen: { css: 'hue-rotate(90deg) saturate(2.2) contrast(1.2)', cat: 'neon' },
-  neonYellow: { css: 'hue-rotate(30deg) saturate(2) brightness(1.1)', cat: 'neon' },
-  // Nature
   forest: { css: 'hue-rotate(30deg) saturate(1.3) brightness(0.95)', cat: 'nature' },
   ocean: { css: 'hue-rotate(190deg) saturate(1.4) brightness(1.05)', cat: 'nature' },
   desert: { css: 'sepia(0.4) saturate(1.3) brightness(1.05) hue-rotate(-10deg)', cat: 'nature' },
@@ -84,7 +74,6 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let originalImage = null;
 
-// ---------- Toast ----------
 function showToast(msg) {
   const t = document.getElementById('toast');
   if (!t) return;
@@ -94,23 +83,22 @@ function showToast(msg) {
   t._t = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ---------- History + Undo/Redo ----------
 function saveHistory() {
   if (!originalImage) return;
   state.history = state.history.slice(0, state.historyIndex + 1);
   try {
     state.history.push(canvas.toDataURL());
     state.historyIndex++;
-    if (state.history.length > 25) { state.history.shift(); state.historyIndex--; }
+    if (state.history.length > 20) { state.history.shift(); state.historyIndex--; }
     updateUndoRedoUI();
   } catch(e) {}
 }
 
 function updateUndoRedoUI() {
-  const undoBtn = document.getElementById('undoBtn');
-  const redoBtn = document.getElementById('redoBtn');
-  if (undoBtn) undoBtn.disabled = state.historyIndex <= 0;
-  if (redoBtn) redoBtn.disabled = state.historyIndex >= state.history.length - 1;
+  const u = document.getElementById('undoBtn');
+  const r = document.getElementById('redoBtn');
+  if (u) u.disabled = state.historyIndex <= 0;
+  if (r) r.disabled = state.historyIndex >= state.history.length - 1;
 }
 
 function restoreFromHistory() {
@@ -143,7 +131,6 @@ function doRedo() {
 document.getElementById('undoBtn')?.addEventListener('click', doUndo);
 document.getElementById('redoBtn')?.addEventListener('click', doRedo);
 
-// ---------- Apply Filters ----------
 function applyFilters() {
   if (!originalImage) return;
   const f = state.filters;
@@ -156,13 +143,16 @@ function applyFilters() {
     ${filterCss}
   `.trim();
 
+  const imgW = originalImage._scaledW || originalImage.width;
+  const imgH = originalImage._scaledH || originalImage.height;
   const isRotated90 = state.rotation === 90 || state.rotation === 270;
+
   if (isRotated90) {
-    canvas.width = originalImage.height;
-    canvas.height = originalImage.width;
+    canvas.width = imgH;
+    canvas.height = imgW;
   } else {
-    canvas.width = originalImage.width;
-    canvas.height = originalImage.height;
+    canvas.width = imgW;
+    canvas.height = imgH;
   }
 
   ctx.save();
@@ -171,7 +161,7 @@ function applyFilters() {
   ctx.rotate((state.rotation * Math.PI) / 180);
   ctx.scale(state.flipH ? -1 : 1, state.flipV ? -1 : 1);
   ctx.filter = filterStr;
-  ctx.drawImage(originalImage, -originalImage.width / 2, -originalImage.height / 2);
+  ctx.drawImage(originalImage, -imgW / 2, -imgH / 2, imgW, imgH);
   ctx.restore();
 
   applyPixelEffects();
@@ -187,11 +177,10 @@ function applyPixelEffects() {
 
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const d = imgData.data;
-  const len = d.length;
   const tempR = f.temperature * 0.5, tempB = -f.temperature * 0.5;
   const tintG = -f.tint * 0.5, tintR = f.tint * 0.3, tintB = f.tint * 0.3;
 
-  for (let i = 0; i < len; i += 4) {
+  for (let i = 0; i < d.length; i += 4) {
     let r = d[i], g = d[i+1], b = d[i+2];
     r += tempR + tintR; g += tintG; b += tempB + tintB;
     const lum = 0.299*r + 0.587*g + 0.114*b;
@@ -201,8 +190,7 @@ function applyPixelEffects() {
     if (f.blacks && lum < 50) { const a = f.blacks*0.5; r+=a; g+=a; b+=a; }
     if (f.vibrance) {
       const max = Math.max(r,g,b), min = Math.min(r,g,b);
-      const sat = max - min;
-      const a = (1-sat/255)*f.vibrance*0.5;
+      const a = (1-(max-min)/255)*f.vibrance*0.5;
       const avg = (r+g+b)/3;
       r += (r-avg)*a/100; g += (g-avg)*a/100; b += (b-avg)*a/100;
     }
@@ -258,26 +246,25 @@ function applyConvolution(strength) {
   ctx.putImageData(out, 0, 0);
 }
 
-// ---------- Histogram ----------
 function drawHistogram() {
   const hist = document.getElementById('histogram');
   if (!hist) return;
   const hctx = hist.getContext('2d');
-  hist.width = 200; hist.height = 80;
-  hctx.clearRect(0, 0, 200, 80);
+  hist.width = 160; hist.height = 60;
+  hctx.clearRect(0, 0, 160, 60);
   try {
     const small = document.createElement('canvas');
-    small.width = 100; small.height = 60;
-    small.getContext('2d').drawImage(canvas, 0, 0, 100, 60);
-    const data = small.getContext('2d').getImageData(0, 0, 100, 60).data;
+    small.width = 80; small.height = 40;
+    small.getContext('2d').drawImage(canvas, 0, 0, 80, 40);
+    const data = small.getContext('2d').getImageData(0, 0, 80, 40).data;
     const rH = new Array(256).fill(0), gH = new Array(256).fill(0), bH = new Array(256).fill(0);
     for (let i = 0; i < data.length; i += 4) { rH[data[i]]++; gH[data[i+1]]++; bH[data[i+2]]++; }
     const max = Math.max(...rH, ...gH, ...bH) || 1;
     const draw = (arr, color) => {
       hctx.fillStyle = color;
       for (let i = 0; i < 256; i++) {
-        const barH = (arr[i]/max) * 70;
-        hctx.fillRect(i*(200/256), 80-barH, 200/256, barH);
+        const barH = (arr[i]/max) * 55;
+        hctx.fillRect(i*(160/256), 60-barH, 160/256, barH);
       }
     };
     hctx.globalAlpha = 0.5;
@@ -286,22 +273,29 @@ function drawHistogram() {
   } catch(e) {}
 }
 
-// ---------- Load Image ----------
 function loadImage(src) {
   const img = new Image();
   img.onload = () => {
     originalImage = img;
-    canvas.width = img.width;
-    canvas.height = img.height;
+    const MAX_DIM = 1600;
+    let w = img.width, h = img.height;
+    if (w > MAX_DIM || h > MAX_DIM) {
+      const ratio = Math.min(MAX_DIM / w, MAX_DIM / h);
+      w = Math.round(w * ratio);
+      h = Math.round(h * ratio);
+    }
+    originalImage._scaledW = w;
+    originalImage._scaledH = h;
+    canvas.width = w;
+    canvas.height = h;
     applyFilters();
     document.getElementById('dropZone').classList.add('hide');
     setTimeout(() => { saveHistory(); buildFilterPreviews(); }, 150);
-    showToast('Photo loaded! Try AUTO MAGIC ✨');
+    showToast('Photo loaded! ✨');
   };
   img.src = src;
 }
 
-// ---------- Upload ----------
 document.getElementById('uploadBtn').addEventListener('click', () => {
   const input = document.createElement('input');
   input.type = 'file';
@@ -316,7 +310,6 @@ document.getElementById('uploadBtn').addEventListener('click', () => {
   input.click();
 });
 
-// ---------- Drag & Drop ----------
 const dropZone = document.getElementById('dropZone');
 const canvasArea = document.getElementById('canvasArea');
 ['dragenter', 'dragover'].forEach(ev => {
@@ -342,7 +335,6 @@ canvasArea.addEventListener('drop', (e) => {
   }
 });
 
-// ---------- Sliders ----------
 const sliderMap = {
   exposure: ['exposure', 'exposureVal', ''],
   brightness: ['brightness', 'brightnessVal', '%'],
@@ -378,22 +370,21 @@ Object.keys(sliderMap).forEach(key => {
     state.filters[key] = parseFloat(e.target.value);
     label.textContent = e.target.value + suffix;
     clearTimeout(sliderTimeout);
-    sliderTimeout = setTimeout(applyFilters, 30);
+    sliderTimeout = setTimeout(applyFilters, 40);
   });
   input.addEventListener('change', () => saveHistory());
 });
 
-// ---------- Tabs ----------
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById(tab.dataset.tab)?.classList.add('active');
+    tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   });
 });
 
-// ---------- Filter Previews ----------
 let currentFilterCat = 'all';
 function buildFilterPreviews() {
   const grid = document.getElementById('filterGrid');
@@ -402,17 +393,16 @@ function buildFilterPreviews() {
   Object.keys(FILTERS).forEach(name => {
     const data = FILTERS[name];
     if (currentFilterCat !== 'all' && data.cat !== currentFilterCat) return;
-
     const item = document.createElement('div');
     item.className = 'filter-item' + (state.currentFilter === name ? ' active' : '');
     const thumb = document.createElement('canvas');
-    thumb.width = 100; thumb.height = 70;
+    thumb.width = 100; thumb.height = 60;
     const tctx = thumb.getContext('2d');
     if (originalImage) {
       tctx.filter = data.css || 'none';
-      tctx.drawImage(originalImage, 0, 0, 100, 70);
+      tctx.drawImage(originalImage, 0, 0, 100, 60);
     } else {
-      tctx.fillStyle = '#333'; tctx.fillRect(0, 0, 100, 70);
+      tctx.fillStyle = '#333'; tctx.fillRect(0, 0, 100, 60);
     }
     const label = document.createElement('span');
     label.textContent = name.charAt(0).toUpperCase() + name.slice(1);
@@ -439,19 +429,17 @@ document.querySelectorAll('.cat-btn').forEach(btn => {
   });
 });
 
-// ---------- Toolbar ----------
 document.querySelectorAll('.tool-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tool = btn.dataset.tool;
     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    if (tool === 'move') return showToast('Move tool ready');
+    if (tool === 'move') return showToast('Move tool');
     if (tool === 'crop') {
       if (!originalImage) return showToast('Upload image first!');
       document.querySelector('.tab[data-tab="crop"]').click();
-      openControlsMobile();
-      showToast('Crop mode — choose ratio ✂️');
+      openPanel();
     }
     if (tool === 'rotate') {
       if (!originalImage) return showToast('Upload image first!');
@@ -475,7 +463,7 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
     }
     if (tool === 'brush') {
       if (!originalImage) return showToast('Upload image first!');
-      showToast('Brush: click canvas to paint');
+      showToast('Tap canvas to paint');
       canvas.style.cursor = 'crosshair';
     }
     if (tool === 'ai-bg') {
@@ -484,8 +472,7 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
     }
     if (tool === 'layers') {
       document.querySelector('.tab[data-tab="layers"]').click();
-      openControlsMobile();
-      showToast('Layers panel opened 📚');
+      openPanel();
     }
     if (tool === 'undo') doUndo();
     if (tool === 'redo') doRedo();
@@ -493,7 +480,6 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
   });
 });
 
-// Brush
 canvas.addEventListener('click', (e) => {
   const activeTool = document.querySelector('.tool-btn.active')?.dataset.tool;
   if (activeTool !== 'brush') return;
@@ -507,7 +493,6 @@ canvas.addEventListener('click', (e) => {
   saveHistory();
 });
 
-// ---------- Reset ----------
 function resetAll() {
   if (!originalImage) return showToast('Nothing to reset');
   Object.keys(state.filters).forEach(k => {
@@ -529,7 +514,6 @@ function resetAll() {
 }
 document.getElementById('resetAll')?.addEventListener('click', resetAll);
 
-// ---------- Compare ----------
 document.getElementById('compareBtn')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   const saved = JSON.parse(JSON.stringify(state.filters));
@@ -548,11 +532,6 @@ document.getElementById('compareBtn')?.addEventListener('click', () => {
   }, 1500);
 });
 
-document.getElementById('historyBtn')?.addEventListener('click', () => {
-  showToast(`History: ${state.historyIndex + 1}/${state.history.length}`);
-});
-
-// ---------- Presets ----------
 document.getElementById('presetBtn')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   const presets = {
@@ -581,7 +560,6 @@ document.getElementById('presetBtn')?.addEventListener('click', () => {
   }
 });
 
-// ---------- Download ----------
 document.getElementById('downloadBtn')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   const link = document.createElement('a');
@@ -591,12 +569,11 @@ document.getElementById('downloadBtn')?.addEventListener('click', () => {
   showToast('Downloaded! 💾');
 });
 
-// ---------- AUTO MAGIC ----------
 document.getElementById('autoEnhanceBtn')?.addEventListener('click', (e) => {
   if (!originalImage) return showToast('Upload image first!');
   const btn = e.currentTarget;
   btn.classList.add('loading');
-  showToast('Analyzing image... 🔍');
+  showToast('Analyzing... 🔍');
   setTimeout(() => {
     const small = document.createElement('canvas');
     small.width = 100; small.height = 100;
@@ -632,11 +609,10 @@ document.getElementById('autoEnhanceBtn')?.addEventListener('click', (e) => {
     });
     applyFilters(); saveHistory();
     btn.classList.remove('loading');
-    showToast('AUTO MAGIC applied! ✨📸');
+    showToast('AUTO MAGIC! ✨📸');
   }, 800);
 });
 
-// ---------- HDR ----------
 document.getElementById('hdrBtn')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   Object.assign(state.filters, { contrast: 130, saturation: 135, highlights: -25, shadows: 35, clarity: 40, whites: 15 });
@@ -649,7 +625,6 @@ document.getElementById('hdrBtn')?.addEventListener('click', () => {
   showToast('HDR Boost! 🌅');
 });
 
-// ---------- Portrait ----------
 document.getElementById('portraitBtn')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   Object.assign(state.filters, { skin: 55, bokeh: 35, brightness: 108, vibrance: 20, highlights: -12 });
@@ -662,25 +637,19 @@ document.getElementById('portraitBtn')?.addEventListener('click', () => {
   showToast('Portrait Mode! 👤✨');
 });
 
-// ============================================
-// AI BACKGROUND REMOVE
-// ============================================
 async function removeBackgroundAI() {
-  if (!originalImage) return showToast('Upload image first!');
-  if (typeof bodyPix === 'undefined') return showToast('AI model loading... wait 5s');
+  if (typeof bodyPix === 'undefined') return showToast('AI loading... wait');
   const loading = document.getElementById('aiLoading');
   const progress = document.getElementById('aiProgress');
   loading.classList.add('active');
-  progress.textContent = 'Loading AI model... (10s)';
+  progress.textContent = 'Loading AI model...';
   try {
     const net = await bodyPix.load({ architecture: 'MobileNetV1', outputStride: 16, multiplier: 0.75, quantBytes: 2 });
-    progress.textContent = 'Detecting person...';
-    await new Promise(r => setTimeout(r, 100));
+    progress.textContent = 'Detecting...';
     const segmentation = await net.segmentPerson(canvas, { internalResolution: 'medium', segmentationThreshold: 0.7 });
-    progress.textContent = 'Removing background...';
+    progress.textContent = 'Removing BG...';
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const d = imgData.data;
-    const mask = segmentation.data;
+    const d = imgData.data, mask = segmentation.data;
     for (let i = 0; i < mask.length; i++) {
       if (mask[i] === 0) d[i*4 + 3] = 0;
     }
@@ -700,21 +669,19 @@ async function removeBackgroundAI() {
     fctx.drawImage(checker, 0, 0);
     fctx.drawImage(canvas, 0, 0);
     originalImage = final;
+    originalImage._scaledW = final.width;
+    originalImage._scaledH = final.height;
     applyFilters();
     saveHistory();
     loading.classList.remove('active');
-    showToast('Background removed! 🤖✨');
+    showToast('BG removed! 🤖✨');
   } catch (err) {
     loading.classList.remove('active');
-    console.error(err);
     showToast('AI failed — try smaller image');
   }
 }
 document.getElementById('aiBgBtn')?.addEventListener('click', removeBackgroundAI);
 
-// ============================================
-// CROP with Aspect Ratios
-// ============================================
 let cropState = { active: false, x: 0, y: 0, w: 0, h: 0, ratio: 'free' };
 
 document.querySelectorAll('.ratio-btn').forEach(btn => {
@@ -737,9 +704,9 @@ function startCrop() {
   let h = canvas.height * 0.7;
   if (cropState.ratio !== 'free') {
     const [rw, rh] = cropState.ratio.split(':').map(Number);
-    const ratio = rw / rh;
-    if (w / h > ratio) w = h * ratio;
-    else h = w / ratio;
+    const r = rw / rh;
+    if (w / h > r) w = h * r;
+    else h = w / r;
   }
   cropState.x = (canvas.width - w) / 2;
   cropState.y = (canvas.height - h) / 2;
@@ -781,6 +748,8 @@ document.getElementById('applyCrop')?.addEventListener('click', () => {
   const img = new Image();
   img.onload = () => {
     originalImage = img;
+    originalImage._scaledW = img.width;
+    originalImage._scaledH = img.height;
     canvas.width = img.width;
     canvas.height = img.height;
     applyFilters();
@@ -797,62 +766,42 @@ function cancelCrop() {
   document.getElementById('cropOverlay').classList.remove('active');
 }
 
-// Crop drag
 const cropOverlay = document.getElementById('cropOverlay');
 let dragging = false, dragStart = {x:0, y:0};
 
-cropOverlay.addEventListener('mousedown', (e) => {
+function getCropPos(clientX, clientY) {
+  const rect = cropOverlay.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) * (cropOverlay.width / rect.width),
+    y: (clientY - rect.top) * (cropOverlay.height / rect.height)
+  };
+}
+
+function startDrag(clientX, clientY) {
   if (!cropState.active) return;
-  const rect = cropOverlay.getBoundingClientRect();
-  const mx = (e.clientX - rect.left) * (cropOverlay.width / rect.width);
-  const my = (e.clientY - rect.top) * (cropOverlay.height / rect.height);
-  if (mx > cropState.x && mx < cropState.x + cropState.w && my > cropState.y && my < cropState.y + cropState.h) {
+  const pos = getCropPos(clientX, clientY);
+  if (pos.x > cropState.x && pos.x < cropState.x + cropState.w && pos.y > cropState.y && pos.y < cropState.y + cropState.h) {
     dragging = true;
-    dragStart = { x: mx - cropState.x, y: my - cropState.y };
+    dragStart = { x: pos.x - cropState.x, y: pos.y - cropState.y };
   }
-});
-cropOverlay.addEventListener('mousemove', (e) => {
+}
+
+function moveDrag(clientX, clientY) {
   if (!dragging) return;
-  const rect = cropOverlay.getBoundingClientRect();
-  const mx = (e.clientX - rect.left) * (cropOverlay.width / rect.width);
-  const my = (e.clientY - rect.top) * (cropOverlay.height / rect.height);
-  cropState.x = Math.max(0, Math.min(cropOverlay.width - cropState.w, mx - dragStart.x));
-  cropState.y = Math.max(0, Math.min(cropOverlay.height - cropState.h, my - dragStart.y));
+  const pos = getCropPos(clientX, clientY);
+  cropState.x = Math.max(0, Math.min(cropOverlay.width - cropState.w, pos.x - dragStart.x));
+  cropState.y = Math.max(0, Math.min(cropOverlay.height - cropState.h, pos.y - dragStart.y));
   drawCropOverlay();
-});
+}
+
+cropOverlay.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
+cropOverlay.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
 cropOverlay.addEventListener('mouseup', () => dragging = false);
 cropOverlay.addEventListener('mouseleave', () => dragging = false);
-
-// Touch crop
-cropOverlay.addEventListener('touchstart', (e) => {
-  if (!cropState.active) return;
-  const t = e.touches[0];
-  const rect = cropOverlay.getBoundingClientRect();
-  const mx = (t.clientX - rect.left) * (cropOverlay.width / rect.width);
-  const my = (t.clientY - rect.top) * (cropOverlay.height / rect.height);
-  if (mx > cropState.x && mx < cropState.x + cropState.w && my > cropState.y && my < cropState.y + cropState.h) {
-    dragging = true;
-    dragStart = { x: mx - cropState.x, y: my - cropState.y };
-  }
-}, { passive: true });
-
-cropOverlay.addEventListener('touchmove', (e) => {
-  if (!dragging) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  const rect = cropOverlay.getBoundingClientRect();
-  const mx = (t.clientX - rect.left) * (cropOverlay.width / rect.width);
-  const my = (t.clientY - rect.top) * (cropOverlay.height / rect.height);
-  cropState.x = Math.max(0, Math.min(cropOverlay.width - cropState.w, mx - dragStart.x));
-  cropState.y = Math.max(0, Math.min(cropOverlay.height - cropState.h, my - dragStart.y));
-  drawCropOverlay();
-}, { passive: false });
-
+cropOverlay.addEventListener('touchstart', e => { startDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+cropOverlay.addEventListener('touchmove', e => { if (!dragging) return; e.preventDefault(); moveDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 cropOverlay.addEventListener('touchend', () => dragging = false);
 
-// ============================================
-// LAYERS
-// ============================================
 function addLayer(name = 'Layer') {
   if (!originalImage) return showToast('Upload image first!');
   const layerCanvas = document.createElement('canvas');
@@ -867,7 +816,7 @@ function addLayer(name = 'Layer') {
     opacity: 100
   });
   renderLayersList();
-  showToast(`Layer added: ${name} 📚`);
+  showToast(`Layer added 📚`);
 }
 
 function renderLayersList() {
@@ -879,29 +828,22 @@ function renderLayersList() {
     item.className = 'layer-item' + (idx === state.activeLayer ? ' active' : '');
     item.innerHTML = `
       <div class="layer-thumb" style="background-image: url(${layer.canvas.toDataURL()})"></div>
-      <div class="layer-info">
-        <h4>${layer.name}</h4>
-        <p>Opacity: ${layer.opacity}%</p>
-      </div>
+      <div class="layer-info"><h4>${layer.name}</h4><p>${layer.opacity}%</p></div>
       <div class="layer-actions">
         <button data-action="toggle"><i class="fas fa-eye"></i></button>
         <button data-action="delete"><i class="fas fa-trash"></i></button>
       </div>
     `;
-    item.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      state.activeLayer = idx;
-      renderLayersList();
-    });
-    item.querySelector('[data-action="toggle"]').addEventListener('click', () => {
+    item.querySelector('[data-action="toggle"]').addEventListener('click', (e) => {
+      e.stopPropagation();
       layer.visible = !layer.visible;
       renderLayersList();
     });
-    item.querySelector('[data-action="delete"]').addEventListener('click', () => {
+    item.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+      e.stopPropagation();
       state.layers.splice(idx, 1);
       state.activeLayer = Math.max(0, state.activeLayer - 1);
       renderLayersList();
-      showToast('Layer deleted 🗑️');
     });
     list.appendChild(item);
   });
@@ -909,7 +851,7 @@ function renderLayersList() {
 
 document.getElementById('addLayerBtn')?.addEventListener('click', () => addLayer());
 document.getElementById('mergeLayersBtn')?.addEventListener('click', () => {
-  if (state.layers.length === 0) return showToast('No layers to merge');
+  if (state.layers.length === 0) return showToast('No layers');
   const merged = document.createElement('canvas');
   merged.width = canvas.width;
   merged.height = canvas.height;
@@ -919,18 +861,17 @@ document.getElementById('mergeLayersBtn')?.addEventListener('click', () => {
   const img = new Image();
   img.onload = () => {
     originalImage = img;
+    originalImage._scaledW = img.width;
+    originalImage._scaledH = img.height;
     applyFilters();
     saveHistory();
     state.layers = [];
     renderLayersList();
-    showToast('Layers merged! 🔗');
+    showToast('Merged! 🔗');
   };
   img.src = merged.toDataURL();
 });
 
-// ============================================
-// KOTHA EFFECTS — Rain, Snow, Fire, etc.
-// ============================================
 function applySpecialEffect(effect) {
   if (!originalImage) return showToast('Upload image first!');
   const w = canvas.width, h = canvas.height;
@@ -939,92 +880,59 @@ function applySpecialEffect(effect) {
     ctx.strokeStyle = 'rgba(180, 200, 255, 0.6)';
     ctx.lineWidth = 1;
     for (let i = 0; i < 300; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x - 3, y + 15);
-      ctx.stroke();
+      const x = Math.random() * w, y = Math.random() * h;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 3, y + 15); ctx.stroke();
     }
   }
   else if (effect === 'snow') {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
     for (let i = 0; i < 250; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const r = Math.random() * 3 + 1;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(Math.random()*w, Math.random()*h, Math.random()*3+1, 0, Math.PI*2);
       ctx.fill();
     }
   }
   else if (effect === 'confetti') {
-    const colors = ['#ff0066', '#ffcc00', '#00ffcc', '#8b5cf6', '#ec4899', '#06b6d4'];
+    const c = ['#ff0066', '#ffcc00', '#00ffcc', '#8b5cf6', '#ec4899', '#06b6d4'];
     for (let i = 0; i < 200; i++) {
-      ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      ctx.fillRect(x, y, 6, 10);
+      ctx.fillStyle = c[Math.floor(Math.random()*c.length)];
+      ctx.fillRect(Math.random()*w, Math.random()*h, 6, 10);
     }
   }
   else if (effect === 'fire') {
-    const grad = ctx.createRadialGradient(w/2, h, 0, w/2, h, h*0.8);
-    grad.addColorStop(0, 'rgba(255, 200, 50, 0.7)');
-    grad.addColorStop(0.5, 'rgba(255, 100, 20, 0.5)');
-    grad.addColorStop(1, 'rgba(255, 30, 0, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 150; i++) {
-      const x = Math.random() * w;
-      const y = h - Math.random() * h * 0.4;
-      ctx.fillStyle = `rgba(255, ${150 + Math.random()*100}, 0, ${Math.random()*0.6})`;
-      ctx.beginPath();
-      ctx.arc(x, y, Math.random()*3+1, 0, Math.PI*2);
-      ctx.fill();
-    }
+    const g = ctx.createRadialGradient(w/2, h, 0, w/2, h, h*0.8);
+    g.addColorStop(0, 'rgba(255, 200, 50, 0.7)');
+    g.addColorStop(0.5, 'rgba(255, 100, 20, 0.5)');
+    g.addColorStop(1, 'rgba(255, 30, 0, 0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'sparkle') {
     for (let i = 0; i < 100; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const size = Math.random() * 8 + 4;
+      const x = Math.random()*w, y = Math.random()*h, s = Math.random()*8+4;
       ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.8+0.2})`;
       ctx.beginPath();
-      ctx.moveTo(x, y - size);
-      ctx.lineTo(x + size/3, y - size/3);
-      ctx.lineTo(x + size, y);
-      ctx.lineTo(x + size/3, y + size/3);
-      ctx.lineTo(x, y + size);
-      ctx.lineTo(x - size/3, y + size/3);
-      ctx.lineTo(x - size, y);
-      ctx.lineTo(x - size/3, y - size/3);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(x, y-s); ctx.lineTo(x+s/3, y-s/3); ctx.lineTo(x+s, y);
+      ctx.lineTo(x+s/3, y+s/3); ctx.lineTo(x, y+s); ctx.lineTo(x-s/3, y+s/3);
+      ctx.lineTo(x-s, y); ctx.lineTo(x-s/3, y-s/3); ctx.closePath(); ctx.fill();
     }
   }
   else if (effect === 'bokehLight') {
-    const colors = ['#ff0066', '#ffcc00', '#00ffcc', '#8b5cf6', '#ec4899'];
+    const c = ['#ff0066', '#ffcc00', '#00ffcc', '#8b5cf6', '#ec4899'];
     for (let i = 0; i < 60; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const r = Math.random() * 40 + 15;
-      const color = colors[Math.floor(Math.random() * colors.length)];
+      const x = Math.random()*w, y = Math.random()*h, r = Math.random()*40+15;
+      const color = c[Math.floor(Math.random()*c.length)];
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, color + '88');
-      g.addColorStop(1, color + '00');
+      g.addColorStop(0, color + '88'); g.addColorStop(1, color + '00');
       ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
     }
   }
   else if (effect === 'vignettePro') {
-    const g = ctx.createRadialGradient(w/2, h/2, Math.min(w, h)/3, w/2, h/2, Math.max(w, h)/1.1);
+    const g = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)/3, w/2, h/2, Math.max(w,h)/1.1);
     g.addColorStop(0, 'rgba(0,0,0,0)');
     g.addColorStop(0.7, 'rgba(0,0,0,0.3)');
     g.addColorStop(1, 'rgba(0,0,0,0.85)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'filmGrain') {
     const imgData = ctx.getImageData(0, 0, w, h);
@@ -1046,12 +954,9 @@ function applySpecialEffect(effect) {
   }
   else if (effect === 'mirror') {
     const half = document.createElement('canvas');
-    half.width = w / 2; half.height = h;
+    half.width = w/2; half.height = h;
     half.getContext('2d').drawImage(canvas, 0, 0, w/2, h, 0, 0, w/2, h);
-    ctx.save();
-    ctx.scale(-1, 1);
-    ctx.drawImage(half, -w, 0);
-    ctx.restore();
+    ctx.save(); ctx.scale(-1, 1); ctx.drawImage(half, -w, 0); ctx.restore();
   }
   else if (effect === 'dragan') {
     state.filters.clarity = 60;
@@ -1060,64 +965,49 @@ function applySpecialEffect(effect) {
     state.filters.shadows = -20;
     applyFilters();
   }
-  else if (effect === 'orTon') {
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = 0.4;
-    ctx.filter = 'blur(30px) saturate(1.5)';
-    ctx.drawImage(canvas, 0, 0);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
-    ctx.filter = 'none';
-  }
   else if (effect === 'sunrays') {
-    const cx = w * 0.7, cy = 0;
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w);
-    grad.addColorStop(0, 'rgba(255, 240, 180, 0.6)');
-    grad.addColorStop(0.3, 'rgba(255, 220, 100, 0.3)');
-    grad.addColorStop(1, 'rgba(255, 200, 50, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
+    const cx = w*0.7, cy = 0;
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, w);
+    g.addColorStop(0, 'rgba(255, 240, 180, 0.6)');
+    g.addColorStop(0.3, 'rgba(255, 220, 100, 0.3)');
+    g.addColorStop(1, 'rgba(255, 200, 50, 0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < 8; i++) {
-      const angle = (Math.PI / 4) * i + 0.3;
-      ctx.strokeStyle = `rgba(255, 240, 180, ${0.3 + Math.random()*0.2})`;
-      ctx.lineWidth = Math.random() * 30 + 20;
+      const angle = (Math.PI/4)*i + 0.3;
+      ctx.strokeStyle = `rgba(255, 240, 180, ${0.3+Math.random()*0.2})`;
+      ctx.lineWidth = Math.random()*30+20;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + Math.cos(angle) * w * 1.5, cy + Math.sin(angle) * w * 1.5);
+      ctx.lineTo(cx + Math.cos(angle)*w*1.5, cy + Math.sin(angle)*w*1.5);
       ctx.stroke();
     }
     ctx.restore();
   }
   else if (effect === 'spotlight') {
-    const g = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h)*0.6);
+    const g = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)*0.6);
     g.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
     g.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
     g.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'rainbow') {
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, 'rgba(255, 0, 0, 0.15)');
-    grad.addColorStop(0.17, 'rgba(255, 165, 0, 0.15)');
-    grad.addColorStop(0.33, 'rgba(255, 255, 0, 0.15)');
-    grad.addColorStop(0.5, 'rgba(0, 255, 0, 0.15)');
-    grad.addColorStop(0.67, 'rgba(0, 127, 255, 0.15)');
-    grad.addColorStop(0.83, 'rgba(75, 0, 130, 0.15)');
-    grad.addColorStop(1, 'rgba(148, 0, 211, 0.15)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, 'rgba(255, 0, 0, 0.15)');
+    g.addColorStop(0.17, 'rgba(255, 165, 0, 0.15)');
+    g.addColorStop(0.33, 'rgba(255, 255, 0, 0.15)');
+    g.addColorStop(0.5, 'rgba(0, 255, 0, 0.15)');
+    g.addColorStop(0.67, 'rgba(0, 127, 255, 0.15)');
+    g.addColorStop(0.83, 'rgba(75, 0, 130, 0.15)');
+    g.addColorStop(1, 'rgba(148, 0, 211, 0.15)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'stars') {
     for (let i = 0; i < 300; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const r = Math.random() * 2 + 0.5;
       ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.9+0.1})`;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(Math.random()*w, Math.random()*h, Math.random()*2+0.5, 0, Math.PI*2);
       ctx.fill();
     }
   }
@@ -1142,47 +1032,28 @@ function applySpecialEffect(effect) {
         const shift = Math.floor((Math.random() - 0.5) * 30);
         for (let x = 0; x < w; x++) {
           const srcX = Math.max(0, Math.min(w-1, x + shift));
-          const idx = (y * w + x) * 4;
-          const sIdx = (y * w + srcX) * 4;
-          d[idx] = d[sIdx];
-          d[idx+1] = d[sIdx+1];
-          d[idx+2] = d[sIdx+2];
+          const idx = (y*w + x)*4, sIdx = (y*w + srcX)*4;
+          d[idx] = d[sIdx]; d[idx+1] = d[sIdx+1]; d[idx+2] = d[sIdx+2];
         }
       }
     }
     ctx.putImageData(imgData, 0, 0);
   }
   else if (effect === 'lensFlare') {
-    const grad = ctx.createRadialGradient(w*0.8, h*0.3, 0, w*0.8, h*0.3, w*0.4);
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-    grad.addColorStop(0.2, 'rgba(255, 240, 200, 0.5)');
-    grad.addColorStop(0.5, 'rgba(255, 200, 100, 0.2)');
-    grad.addColorStop(1, 'rgba(255, 150, 50, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
+    const g = ctx.createRadialGradient(w*0.8, h*0.3, 0, w*0.8, h*0.3, w*0.4);
+    g.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+    g.addColorStop(0.2, 'rgba(255, 240, 200, 0.5)');
+    g.addColorStop(0.5, 'rgba(255, 200, 100, 0.2)');
+    g.addColorStop(1, 'rgba(255, 150, 50, 0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
     ctx.globalCompositeOperation = 'lighter';
     for (let i = 1; i <= 5; i++) {
       ctx.fillStyle = `rgba(255, ${200-i*20}, ${100+i*20}, 0.3)`;
       ctx.beginPath();
-      ctx.arc(w*0.8 - i*80, h*0.3 + i*30, 15 - i*2, 0, Math.PI * 2);
+      ctx.arc(w*0.8 - i*80, h*0.3 + i*30, 15-i*2, 0, Math.PI*2);
       ctx.fill();
     }
     ctx.globalCompositeOperation = 'source-over';
-  }
-  else if (effect === 'doubleExposure') {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
-    for (let i = 0; i < d.length; i += 4) {
-      d[i] = Math.min(255, d[i] * 0.6 + 100);
-      d[i+1] = Math.min(255, d[i+1] * 0.7 + 50);
-      d[i+2] = Math.min(255, d[i+2] * 0.8 + 150);
-    }
-    ctx.putImageData(imgData, 0, 0);
-    ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.5;
-    ctx.drawImage(canvas, 20, 20, w-40, h-40);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
   }
 
   saveHistory();
@@ -1190,14 +1061,9 @@ function applySpecialEffect(effect) {
 }
 
 document.querySelectorAll('.effect-chip, .effect-btn[data-effect]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    applySpecialEffect(btn.dataset.effect);
-  });
+  btn.addEventListener('click', () => applySpecialEffect(btn.dataset.effect));
 });
 
-// ============================================
-// COLOR OVERLAY
-// ============================================
 document.getElementById('applyOverlay')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   const color = document.getElementById('overlayColor').value;
@@ -1207,12 +1073,9 @@ document.getElementById('applyOverlay')?.addEventListener('click', () => {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.globalAlpha = 1;
   saveHistory();
-  showToast('Color overlay applied 🎨');
+  showToast('Overlay applied 🎨');
 });
 
-// ============================================
-// FRAMES
-// ============================================
 const FRAMES = [
   { name: 'White', style: 'white' }, { name: 'Black', style: 'black' },
   { name: 'Gold', style: 'gold' }, { name: 'Neon', style: 'neon' },
@@ -1254,8 +1117,7 @@ function applyFrame(style) {
   if (style === 'gold') {
     const g = ctx.createLinearGradient(0, 0, newW, newH);
     g.addColorStop(0, '#d4af37'); g.addColorStop(0.5, '#fff4b0'); g.addColorStop(1, '#d4af37');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, newW, newH);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, newW, newH);
   }
   if (style === 'double') {
     ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4;
@@ -1270,12 +1132,9 @@ function applyFrame(style) {
 }
 buildFrames();
 
-// ============================================
-// TEXT TOOL
-// ============================================
 document.getElementById('addTextBtn')?.addEventListener('click', () => {
   const text = document.getElementById('textInput').value;
-  if (!text) return showToast('Enter text first!');
+  if (!text) return showToast('Enter text!');
   const color = document.getElementById('textColor').value;
   const size = document.getElementById('textSize').value;
   const font = document.getElementById('textFont').value;
@@ -1294,9 +1153,6 @@ document.getElementById('closeText')?.addEventListener('click', () => {
   document.getElementById('textModal').classList.remove('active');
 });
 
-// ============================================
-// STICKERS
-// ============================================
 const STICKERS = ['😀','😎','🤩','😍','🥰','😂','🤣','😇','🥳','😜','🌟','⭐','✨','💫','🌈','❤️','💖','💝','🔥','💯','🎉','🎊','🎈','🎁','🌸','🌺','🌻','🍕','🍔','🍟','☕','🎵','🎸','⚡','💎','👑','🎯','🏆','📸','🎬'];
 function buildStickers() {
   const grid = document.getElementById('stickerGrid');
@@ -1322,9 +1178,6 @@ document.getElementById('closeSticker')?.addEventListener('click', () => {
   document.getElementById('stickerModal').classList.remove('active');
 });
 
-// ============================================
-// CAMERA
-// ============================================
 const cameraModal = document.getElementById('cameraModal');
 const video = document.getElementById('video');
 let stream = null;
@@ -1349,18 +1202,11 @@ function closeCamera() {
   if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
 }
 
-// ============================================
-// LIVE THEME TOGGLE
-// ============================================
 document.getElementById('themeToggle')?.addEventListener('click', (e) => {
-  const body = document.body;
-  const isLight = body.dataset.theme === 'light';
-  body.dataset.theme = isLight ? '' : 'light';
+  const isLight = document.body.dataset.theme === 'light';
+  document.body.dataset.theme = isLight ? '' : 'light';
   e.currentTarget.innerHTML = isLight ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
-  // Live animation
-  e.currentTarget.style.transform = 'rotate(360deg)';
-  setTimeout(() => e.currentTarget.style.transform = '', 400);
-  showToast(isLight ? 'Dark mode 🌙' : 'Light mode ☀️');
+  showToast(isLight ? 'Dark 🌙' : 'Light ☀️');
 });
 
 document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
@@ -1368,59 +1214,40 @@ document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
   else document.exitFullscreen();
 });
 
-// ============================================
-// MOBILE MENU / PANEL
-// ============================================
 const controlsPanel = document.getElementById('controlsPanel');
-const mobileToolbar = document.getElementById('mobileToolbar');
+const panelOverlay = document.getElementById('panelOverlay');
 
-function openControlsMobile() {
-  if (window.innerWidth <= 900) controlsPanel.classList.add('open');
+function openPanel() {
+  if (window.innerWidth <= 900) {
+    controlsPanel.classList.add('open');
+    panelOverlay.classList.add('active');
+  }
+}
+
+function closePanel() {
+  controlsPanel.classList.remove('open');
+  panelOverlay.classList.remove('active');
 }
 
 document.getElementById('menuBtn')?.addEventListener('click', () => {
-  controlsPanel.classList.toggle('open');
+  if (controlsPanel.classList.contains('open')) closePanel();
+  else openPanel();
 });
 
-document.getElementById('panelClose')?.addEventListener('click', () => {
-  controlsPanel.classList.remove('open');
-});
+document.getElementById('panelClose')?.addEventListener('click', closePanel);
+panelOverlay?.addEventListener('click', closePanel);
 
-// Mobile toolbar buttons
-document.querySelectorAll('.mt-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.mt-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const target = btn.dataset.mtool;
-    const map = {
-      adjust: 'light',
-      filters: 'filters',
-      effects: 'effects',
-      colors: 'color',
-      light: 'dslr',
-      more: 'crop'
-    };
-    const tabId = map[target];
-    document.querySelector(`.tab[data-tab="${tabId}"]`)?.click();
-    openControlsMobile();
-  });
-});
+if (window.innerWidth > 900) controlsPanel.classList.add('open');
 
-// ============================================
-// KEYBOARD SHORTCUTS
-// ============================================
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'z') { e.preventDefault(); doUndo(); }
   if (e.ctrlKey && e.key === 'y') { e.preventDefault(); doRedo(); }
   if (e.ctrlKey && e.key === 's') { e.preventDefault(); document.getElementById('downloadBtn')?.click(); }
 });
 
-// ============================================
-// INIT
-// ============================================
 buildFilterPreviews();
 renderLayersList();
 updateUndoRedoUI();
 
-console.log('%c AVR PRO STUDIOS v4.0 ', 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 20px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
-console.log('%c Ultra: AI + 40 Filters + 15 Effects + Mobile 📸🚀', 'color: #06b6d4; font-size: 14px;');
+console.log('%c AVR PRO STUDIOS v6.0 ', 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 20px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
+console.log('%c FINAL: Mobile-First • 9 Tabs • Full Features 📸🚀', 'color: #06b6d4; font-size: 14px;');
