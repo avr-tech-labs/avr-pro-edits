@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0f">
-<title>AVR PRO STUDIOS — DSLR Photo Editor</title>
+<title>AVR PHOTO EDITS — Pro Photo Editor</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -44,11 +44,9 @@
     <div class="logo-text">
       <h1 class="brand-line">
         <span class="letter">A</span><span class="letter">V</span><span class="letter">R</span>
-        <span class="space"></span>
-        <span class="letter pro">P</span><span class="letter pro">R</span><span class="letter pro">O</span>
       </h1>
-      <h2 class="studios-line">STUDIOS</h2>
-      <p class="tagline-line">DSLR Quality • Mobile Simplicity</p>
+      <h2 class="studios-line">PHOTO EDITS</h2>
+      <p class="tagline-line">Professional Photo Editor</p>
     </div>
   </div>
   <div class="loader-bar"><div class="loader-fill"></div></div>
@@ -63,218 +61,121 @@
 
 <!-- Header -->
 <header class="header">
-  <div class="brand">
-    <div class="brand-logo live-logo">
-      <div class="live-ring"></div>
-      <svg viewBox="0 0 100 100">
-        <path d="M 15 75 L 30 25 L 45 75 M 22 60 L 38 60" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="65" cy="50" r="18" stroke="white" stroke-width="3" fill="none"/>
-        <circle cx="65" cy="50" r="8" fill="white"/>
-      </svg>
-    </div>
-    <div class="brand-text">
-      <h1>AVR <span>PRO</span> STUDIOS</h1>
-      <p>DSLR Photo Editor</p>
-    </div>
+  <button class="header-btn" id="closeAppBtn" title="Add Photo"><i class="fas fa-plus"></i></button>
+  
+  <div class="header-center">
+    <button class="header-btn" id="undoBtn" title="Undo"><i class="fas fa-undo"></i></button>
+    <button class="header-btn" id="redoBtn" title="Redo"><i class="fas fa-redo"></i></button>
   </div>
-
-  <div class="header-actions">
-    <button class="btn-icon" id="undoBtn" title="Undo"><i class="fas fa-undo"></i></button>
-    <button class="btn-icon" id="redoBtn" title="Redo"><i class="fas fa-redo"></i></button>
-    <button class="btn-icon" id="themeToggle" title="Theme"><i class="fas fa-moon"></i></button>
-    <button class="btn-icon" id="fullscreenBtn" title="Fullscreen"><i class="fas fa-expand"></i></button>
-    <button class="btn-primary" id="uploadBtn"><i class="fas fa-upload"></i> <span>Upload</span></button>
-    <button class="btn-primary" id="cameraBtn"><i class="fas fa-camera"></i> <span>Camera</span></button>
-    <button class="btn-magic" id="autoEnhanceBtn"><i class="fas fa-magic"></i> MAGIC</button>
-    <button class="btn-icon menu-btn" id="menuBtn" title="Tools"><i class="fas fa-bars"></i></button>
+  
+  <div class="header-right">
+    <button class="header-btn" id="downloadBtn" title="Save"><i class="fas fa-download"></i></button>
+    <button class="header-btn" id="shareBtn" title="Share"><i class="fas fa-share-alt"></i></button>
   </div>
 </header>
 
-<!-- Workspace -->
-<main class="workspace">
-
-  <!-- Left Tools -->
-  <aside class="tools-panel">
-    <button class="tool-btn active" data-tool="move" title="Move"><i class="fas fa-arrows-alt"></i></button>
-    <button class="tool-btn" data-tool="crop" title="Crop"><i class="fas fa-crop-alt"></i></button>
-    <button class="tool-btn" data-tool="rotate" title="Rotate"><i class="fas fa-sync-alt"></i></button>
-    <button class="tool-btn" data-tool="flip" title="Flip"><i class="fas fa-exchange-alt"></i></button>
-    <button class="tool-btn" data-tool="text" title="Text"><i class="fas fa-font"></i></button>
-    <button class="tool-btn" data-tool="sticker" title="Stickers"><i class="fas fa-smile"></i></button>
-    <button class="tool-btn" data-tool="brush" title="Brush"><i class="fas fa-paint-brush"></i></button>
-    <button class="tool-btn" data-tool="ai-bg" title="AI Background"><i class="fas fa-robot"></i></button>
-    <button class="tool-btn" data-tool="layers" title="Layers"><i class="fas fa-layer-group"></i></button>
-    <button class="tool-btn" data-tool="undo" title="Undo"><i class="fas fa-undo"></i></button>
-    <button class="tool-btn" data-tool="redo" title="Redo"><i class="fas fa-redo"></i></button>
-    <button class="tool-btn" data-tool="reset" title="Reset"><i class="fas fa-trash-alt"></i></button>
-  </aside>
-
-  <!-- Canvas -->
-  <section class="canvas-area" id="canvasArea">
-    <div class="canvas-wrapper" id="canvasWrapper">
-      <canvas id="canvas"></canvas>
-      <canvas id="cropOverlay" class="crop-overlay"></canvas>
-      <div class="drop-zone" id="dropZone">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <h3>Drag & Drop Photo</h3>
-        <p>or tap <b>Upload</b></p>
-      </div>
-    </div>
-    <canvas id="histogram" class="histogram"></canvas>
+<!-- Canvas Area -->
+<main class="canvas-area" id="canvasArea">
+  <div class="canvas-wrapper" id="canvasWrapper">
+    <canvas id="canvas" width="800" height="500"></canvas>
+    <canvas id="cropOverlay" class="crop-overlay"></canvas>
     
-    <div class="ai-loading" id="aiLoading">
-      <div class="ai-spinner"></div>
-      <p>AI Processing...</p>
-      <span id="aiProgress">0%</span>
+    <div class="drop-zone" id="dropZone">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <h3>Tap to Add Photo</h3>
+      <p>Start editing like a pro ✨</p>
     </div>
-  </section>
-
-  <!-- Right Panel -->
-  <aside class="controls-panel" id="controlsPanel">
-    <button class="panel-close" id="panelClose"><i class="fas fa-times"></i></button>
-    
-    <!-- Tabs (Scrollable) -->
-    <div class="tabs" id="tabsBar">
-      <button class="tab active" data-tab="light"><i class="fas fa-sun"></i> Light</button>
-      <button class="tab" data-tab="color"><i class="fas fa-palette"></i> Color</button>
-      <button class="tab" data-tab="detail"><i class="fas fa-sliders-h"></i> Detail</button>
-      <button class="tab" data-tab="dslr"><i class="fas fa-camera-retro"></i> DSLR</button>
-      <button class="tab" data-tab="filters"><i class="fas fa-filter"></i> Filters</button>
-      <button class="tab" data-tab="effects"><i class="fas fa-magic"></i> Effects</button>
-      <button class="tab" data-tab="frames"><i class="fas fa-square"></i> Frames</button>
-      <button class="tab" data-tab="crop"><i class="fas fa-crop-alt"></i> Crop</button>
-      <button class="tab" data-tab="layers"><i class="fas fa-layer-group"></i> Layers</button>
-    </div>
-
-    <!-- Content -->
-    <div class="tab-content-container">
-      
-      <div class="tab-content active" id="light">
-        <div class="slider-group"><label><span>Exposure</span><span id="exposureVal">0</span></label><input type="range" id="exposure" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Brightness</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>
-        <div class="slider-group"><label><span>Contrast</span><span id="contrastVal">100%</span></label><input type="range" id="contrast" min="0" max="200" value="100"></div>
-        <div class="slider-group"><label><span>Highlights</span><span id="highlightsVal">0</span></label><input type="range" id="highlights" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Shadows</span><span id="shadowsVal">0</span></label><input type="range" id="shadows" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Whites</span><span id="whitesVal">0</span></label><input type="range" id="whites" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Blacks</span><span id="blacksVal">0</span></label><input type="range" id="blacks" min="-100" max="100" value="0"></div>
-      </div>
-
-      <div class="tab-content" id="color">
-        <div class="slider-group"><label><span>Saturation</span><span id="saturationVal">100%</span></label><input type="range" id="saturation" min="0" max="200" value="100"></div>
-        <div class="slider-group"><label><span>Vibrance</span><span id="vibranceVal">0</span></label><input type="range" id="vibrance" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Temperature</span><span id="temperatureVal">0</span></label><input type="range" id="temperature" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Tint</span><span id="tintVal">0</span></label><input type="range" id="tint" min="-100" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Hue Rotate</span><span id="hueVal">0°</span></label><input type="range" id="hue" min="0" max="360" value="0"></div>
-        <div class="slider-group"><label><span>Sepia</span><span id="sepiaVal">0%</span></label><input type="range" id="sepia" min="0" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Grayscale</span><span id="grayVal">0%</span></label><input type="range" id="grayscale" min="0" max="100" value="0"></div>
-        
-        <h3 class="tab-title" style="margin-top:20px;">Color Overlay</h3>
-        <div class="color-overlay-row">
-          <input type="color" id="overlayColor" value="#8b5cf6">
-          <input type="range" id="overlayOpacity" min="0" max="100" value="30">
-          <button class="btn-primary" id="applyOverlay">Apply</button>
-        </div>
-      </div>
-
-      <div class="tab-content" id="detail">
-        <div class="slider-group"><label><span>Sharpness</span><span id="sharpnessVal">0</span></label><input type="range" id="sharpness" min="0" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Clarity</span><span id="clarityVal">0</span></label><input type="range" id="clarity" min="0" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Blur</span><span id="blurVal">0px</span></label><input type="range" id="blur" min="0" max="20" value="0"></div>
-        <div class="slider-group"><label><span>Grain</span><span id="grainVal">0</span></label><input type="range" id="grain" min="0" max="100" value="0"></div>
-      </div>
-
-      <div class="tab-content" id="dslr">
-        <div class="slider-group"><label><span>Bokeh Blur</span><span id="bokehVal">0</span></label><input type="range" id="bokeh" min="0" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Skin Smooth</span><span id="skinVal">0</span></label><input type="range" id="skin" min="0" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Vignette</span><span id="vignetteVal">0</span></label><input type="range" id="vignette" min="0" max="100" value="0"></div>
-        <div class="slider-group"><label><span>Lens Flare</span><span id="flareVal">0</span></label><input type="range" id="flare" min="0" max="100" value="0"></div>
-        <button class="effect-btn" id="hdrBtn"><i class="fas fa-sun"></i> HDR Boost</button>
-        <button class="effect-btn" id="portraitBtn"><i class="fas fa-user"></i> Portrait Mode</button>
-        <button class="effect-btn" id="aiBgBtn"><i class="fas fa-robot"></i> AI Background Remove</button>
-      </div>
-
-      <div class="tab-content" id="filters">
-        <div class="filter-categories">
-          <button class="cat-btn active" data-cat="all">All</button>
-          <button class="cat-btn" data-cat="cinematic">Cinematic</button>
-          <button class="cat-btn" data-cat="vintage">Vintage</button>
-          <button class="cat-btn" data-cat="modern">Modern</button>
-          <button class="cat-btn" data-cat="bw">B&W</button>
-          <button class="cat-btn" data-cat="neon">Neon</button>
-          <button class="cat-btn" data-cat="nature">Nature</button>
-        </div>
-        <div class="filter-grid" id="filterGrid"></div>
-      </div>
-
-      <div class="tab-content" id="effects">
-        <h3 class="tab-title">Overlays</h3>
-        <div class="effects-grid">
-          <button class="effect-chip" data-effect="rain"><i class="fas fa-cloud-rain"></i> Rain</button>
-          <button class="effect-chip" data-effect="snow"><i class="fas fa-snowflake"></i> Snow</button>
-          <button class="effect-chip" data-effect="confetti"><i class="fas fa-birthday-cake"></i> Confetti</button>
-          <button class="effect-chip" data-effect="fire"><i class="fas fa-fire"></i> Fire</button>
-          <button class="effect-chip" data-effect="sparkle"><i class="fas fa-star"></i> Sparkle</button>
-          <button class="effect-chip" data-effect="bokehLight"><i class="fas fa-circle"></i> Bokeh</button>
-        </div>
-        
-        <h3 class="tab-title" style="margin-top:20px;">Filters & Style</h3>
-        <button class="effect-btn" data-effect="vignettePro"><i class="fas fa-circle"></i> Vignette Pro</button>
-        <button class="effect-btn" data-effect="filmGrain"><i class="fas fa-braille"></i> Film Grain</button>
-        <button class="effect-btn" data-effect="glow"><i class="fas fa-sun"></i> Soft Glow</button>
-        <button class="effect-btn" data-effect="mirror"><i class="fas fa-clone"></i> Mirror</button>
-        <button class="effect-btn" data-effect="dragan"><i class="fas fa-dragon"></i> Dragan Effect</button>
-        <button class="effect-btn" data-effect="sunrays"><i class="fas fa-sun"></i> Sunrays</button>
-        <button class="effect-btn" data-effect="spotlight"><i class="fas fa-lightbulb"></i> Spotlight</button>
-        <button class="effect-btn" data-effect="rainbow"><i class="fas fa-rainbow"></i> Rainbow</button>
-        <button class="effect-btn" data-effect="stars"><i class="fas fa-star"></i> Star Field</button>
-        <button class="effect-btn" data-effect="neonGlow"><i class="fas fa-bolt"></i> Neon Glow</button>
-        <button class="effect-btn" data-effect="vhsGlitch"><i class="fas fa-tv"></i> VHS Glitch</button>
-        <button class="effect-btn" data-effect="lensFlare"><i class="fas fa-sun"></i> Lens Flare</button>
-      </div>
-
-      <div class="tab-content" id="frames">
-        <div class="frame-grid" id="frameGrid"></div>
-      </div>
-
-      <div class="tab-content" id="crop">
-        <h3 class="tab-title">Aspect Ratio</h3>
-        <div class="crop-ratios">
-          <button class="ratio-btn active" data-ratio="free">Free</button>
-          <button class="ratio-btn" data-ratio="1:1">1:1</button>
-          <button class="ratio-btn" data-ratio="4:3">4:3</button>
-          <button class="ratio-btn" data-ratio="3:2">3:2</button>
-          <button class="ratio-btn" data-ratio="16:9">16:9</button>
-          <button class="ratio-btn" data-ratio="9:16">9:16</button>
-          <button class="ratio-btn" data-ratio="4:5">4:5</button>
-          <button class="ratio-btn" data-ratio="2:3">2:3</button>
-        </div>
-        <div class="crop-actions">
-          <button class="btn-primary" id="applyCrop"><i class="fas fa-check"></i> Apply Crop</button>
-          <button class="btn-secondary" id="cancelCrop"><i class="fas fa-times"></i> Cancel</button>
-        </div>
-      </div>
-
-      <div class="tab-content" id="layers">
-        <h3 class="tab-title">Layers</h3>
-        <div class="layer-controls">
-          <button class="btn-primary" id="addLayerBtn"><i class="fas fa-plus"></i> Add</button>
-          <button class="btn-secondary" id="mergeLayersBtn"><i class="fas fa-compress"></i> Merge</button>
-        </div>
-        <div class="layers-list" id="layersList"></div>
-      </div>
-    </div>
-
-    <!-- Bottom Actions -->
-    <div class="panel-actions">
-      <button class="btn-secondary" id="resetAll"><i class="fas fa-redo"></i> Reset</button>
-      <button class="btn-secondary" id="compareBtn"><i class="fas fa-eye"></i> Compare</button>
-      <button class="btn-secondary" id="presetBtn"><i class="fas fa-bookmark"></i> Presets</button>
-      <button class="btn-success" id="downloadBtn"><i class="fas fa-download"></i> Save</button>
-    </div>
-  </aside>
-
-  <div class="panel-overlay" id="panelOverlay"></div>
+  </div>
+  
+  <div class="ai-loading" id="aiLoading">
+    <div class="ai-spinner"></div>
+    <p>AI Processing...</p>
+    <span id="aiProgress">0%</span>
+  </div>
 </main>
+
+<!-- Bottom Toolbar (Scrollable) -->
+<nav class="bottom-toolbar" id="bottomToolbar">
+  <button class="bt-btn active" data-tool="adjust">
+    <div class="bt-icon"><i class="fas fa-sliders-h"></i></div>
+    <span>Adjust</span>
+  </button>
+  <button class="bt-btn" data-tool="crop">
+    <div class="bt-icon"><i class="fas fa-crop-alt"></i></div>
+    <span>Crop</span>
+  </button>
+  <button class="bt-btn" data-tool="light">
+    <div class="bt-icon"><i class="fas fa-sun"></i></div>
+    <span>Light</span>
+  </button>
+  <button class="bt-btn" data-tool="color">
+    <div class="bt-icon"><i class="fas fa-palette"></i></div>
+    <span>Color</span>
+  </button>
+  <button class="bt-btn" data-tool="tone">
+    <div class="bt-icon"><i class="fas fa-chart-line"></i></div>
+    <span>Tone</span>
+  </button>
+  <button class="bt-btn" data-tool="detail">
+    <div class="bt-icon"><i class="fas fa-search-plus"></i></div>
+    <span>Detail</span>
+  </button>
+  <button class="bt-btn" data-tool="effects">
+    <div class="bt-icon"><i class="fas fa-magic"></i><span class="dot purple"></span></div>
+    <span>Effects</span>
+  </button>
+  <button class="bt-btn" data-tool="filters">
+    <div class="bt-icon"><i class="fas fa-filter"></i></div>
+    <span>Filters</span>
+  </button>
+  <button class="bt-btn" data-tool="portrait">
+    <div class="bt-icon"><i class="fas fa-user-circle"></i></div>
+    <span>Portrait</span>
+  </button>
+  <button class="bt-btn" data-tool="retouch">
+    <div class="bt-icon"><i class="fas fa-band-aid"></i></div>
+    <span>Retouch</span>
+  </button>
+  <button class="bt-btn" data-tool="removebg">
+    <div class="bt-icon"><i class="fas fa-cut"></i><span class="badge">AI</span></div>
+    <span>Remove BG</span>
+  </button>
+  <button class="bt-btn" data-tool="draw">
+    <div class="bt-icon"><i class="fas fa-paint-brush"></i></div>
+    <span>Draw</span>
+  </button>
+  <button class="bt-btn" data-tool="text">
+    <div class="bt-icon"><i class="fas fa-font"></i></div>
+    <span>Text</span>
+  </button>
+  <button class="bt-btn" data-tool="sticker">
+    <div class="bt-icon"><i class="fas fa-smile"></i></div>
+    <span>Sticker</span>
+  </button>
+  <button class="bt-btn" data-tool="frame">
+    <div class="bt-icon"><i class="fas fa-square"></i></div>
+    <span>Frame</span>
+  </button>
+  <button class="bt-btn" data-tool="export">
+    <div class="bt-icon"><i class="fas fa-file-export"></i></div>
+    <span>Export</span>
+  </button>
+</nav>
+
+<!-- Panel -->
+<div class="panel-overlay" id="panelOverlay"></div>
+<aside class="panel" id="panel">
+  <div class="panel-handle"></div>
+  
+  <div class="panel-header">
+    <h3 id="panelTitle">Adjust</h3>
+    <button class="panel-close-btn" id="panelClose"><i class="fas fa-times"></i></button>
+  </div>
+  
+  <div class="panel-tabs" id="panelTabs"></div>
+  <div class="panel-content" id="panelContent"></div>
+  <div class="panel-footer" id="panelFooter"></div>
+</aside>
 
 <!-- Toast -->
 <div id="toast" class="toast"></div>
@@ -291,36 +192,22 @@
   </div>
 </div>
 
-<!-- Text Modal -->
-<div id="textModal" class="modal">
+<!-- Source Modal -->
+<div id="sourceModal" class="modal">
   <div class="modal-content">
-    <h2><i class="fas fa-font"></i> Add Text</h2>
-    <input type="text" id="textInput" placeholder="Enter text..." class="modal-input">
-    <div class="modal-row">
-      <input type="color" id="textColor" value="#ffffff">
-      <input type="range" id="textSize" min="10" max="200" value="48">
-      <select id="textFont">
-        <option value="Poppins">Poppins</option>
-        <option value="Orbitron">Orbitron</option>
-        <option value="Playfair Display">Playfair</option>
-        <option value="Arial">Arial</option>
-        <option value="Georgia">Georgia</option>
-      </select>
+    <h2><i class="fas fa-plus"></i> Add Photo</h2>
+    <div class="source-grid">
+      <button class="source-btn" id="fromGallery">
+        <i class="fas fa-image"></i>
+        <span>Gallery</span>
+      </button>
+      <button class="source-btn" id="fromCamera">
+        <i class="fas fa-camera"></i>
+        <span>Camera</span>
+      </button>
     </div>
     <div class="modal-actions">
-      <button class="btn-primary" id="addTextBtn">Add Text</button>
-      <button class="btn-secondary" id="closeText">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- Stickers Modal -->
-<div id="stickerModal" class="modal">
-  <div class="modal-content">
-    <h2><i class="fas fa-smile"></i> Stickers</h2>
-    <div class="sticker-grid" id="stickerGrid"></div>
-    <div class="modal-actions">
-      <button class="btn-secondary" id="closeSticker">Close</button>
+      <button class="btn-secondary" id="closeSource">Cancel</button>
     </div>
   </div>
 </div>
