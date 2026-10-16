@@ -1,11 +1,12 @@
 /* ============================================
-   AVR PRO STUDIOS — PICSART STYLE v7.0
+   AVR PHOTO EDITS — v8.0 PRO MAX
+   50+ Professional Tools
    ============================================ */
 
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('splash')?.classList.add('hide');
-    showToast('Welcome to AVR PRO STUDIOS! 🎨📸');
+    showToast('Welcome to AVR PHOTO EDITS! 🎨📸');
   }, 3200);
 });
 
@@ -13,28 +14,35 @@ const state = {
   filters: {
     exposure: 0, brightness: 100, contrast: 100, highlights: 0, shadows: 0, whites: 0, blacks: 0,
     saturation: 100, vibrance: 0, temperature: 0, tint: 0, hue: 0, sepia: 0, grayscale: 0, invert: 0,
-    sharpness: 0, clarity: 0, blur: 0, grain: 0, skin: 0, vignette: 0, flare: 0, bokeh: 0
+    sharpness: 0, clarity: 0, texture: 0, dehaze: 0, structure: 0, blur: 0, grain: 0,
+    skin: 0, teeth: 0, eyes: 0, faceSlim: 0,
+    vignette: 0, flare: 0, bokeh: 0, glow: 0, lightLeak: 0,
+    gamma: 100, blackPoint: 0, whitePoint: 100
   },
   currentFilter: 'original',
   rotation: 0,
   flipH: false, flipV: false,
   history: [], historyIndex: -1,
-  currentTool: 'tools',
-  currentPanelTab: 'light'
+  currentTool: 'adjust'
 };
 
 const FILTERS = {
   original: { css: '', cat: 'all' },
+  // Cinematic
   cinematic: { css: 'contrast(1.2) saturate(1.1) hue-rotate(-10deg)', cat: 'cinematic' },
   teal: { css: 'contrast(1.15) saturate(1.1) hue-rotate(-15deg)', cat: 'cinematic' },
   netflix: { css: 'contrast(1.2) saturate(1.1) brightness(0.92) hue-rotate(-5deg)', cat: 'cinematic' },
   moody: { css: 'contrast(1.25) brightness(0.85) saturate(0.85)', cat: 'cinematic' },
   blockbuster: { css: 'contrast(1.3) saturate(1.15) hue-rotate(-10deg) brightness(0.95)', cat: 'cinematic' },
+  matrix: { css: 'contrast(1.2) hue-rotate(80deg) saturate(0.9)', cat: 'cinematic' },
+  // Vintage
   vintage: { css: 'sepia(0.4) contrast(1.1) brightness(0.95)', cat: 'vintage' },
   retro: { css: 'sepia(0.6) contrast(1.15) saturate(0.8)', cat: 'vintage' },
   polaroid: { css: 'sepia(0.25) contrast(1.15) brightness(1.05)', cat: 'vintage' },
   faded: { css: 'contrast(0.85) brightness(1.1) saturate(0.7) sepia(0.15)', cat: 'vintage' },
   kodak: { css: 'saturate(1.3) contrast(1.1) sepia(0.15)', cat: 'vintage' },
+  lomo: { css: 'contrast(1.3) saturate(1.5) hue-rotate(-5deg)', cat: 'vintage' },
+  // Modern
   vivid: { css: 'saturate(1.8) contrast(1.2)', cat: 'modern' },
   hdr: { css: 'contrast(1.3) saturate(1.4) brightness(1.05)', cat: 'modern' },
   dramatic: { css: 'contrast(1.5) brightness(0.9) saturate(0.8)', cat: 'modern' },
@@ -43,16 +51,30 @@ const FILTERS = {
   cool: { css: 'hue-rotate(180deg) saturate(1.2)', cat: 'modern' },
   sunset: { css: 'sepia(0.5) saturate(1.6) hue-rotate(-20deg)', cat: 'modern' },
   cyberpunk: { css: 'hue-rotate(280deg) saturate(1.8) contrast(1.2)', cat: 'modern' },
+  fresh: { css: 'brightness(1.1) saturate(1.15)', cat: 'modern' },
+  // B&W
   bw: { css: 'grayscale(1) contrast(1.2)', cat: 'bw' },
   noir: { css: 'grayscale(1) contrast(1.5) brightness(0.9)', cat: 'bw' },
   highKey: { css: 'grayscale(1) brightness(1.3) contrast(0.9)', cat: 'bw' },
+  lowKey: { css: 'grayscale(1) brightness(0.7) contrast(1.4)', cat: 'bw' },
   silvertone: { css: 'grayscale(0.9) contrast(1.1) sepia(0.15)', cat: 'bw' },
+  // Neon
   neonPink: { css: 'hue-rotate(-60deg) saturate(2) contrast(1.2) brightness(1.1)', cat: 'neon' },
   neonBlue: { css: 'hue-rotate(180deg) saturate(2.5) contrast(1.3)', cat: 'neon' },
   neonPurple: { css: 'hue-rotate(250deg) saturate(2) contrast(1.2)', cat: 'neon' },
+  neonGreen: { css: 'hue-rotate(90deg) saturate(2.2) contrast(1.2)', cat: 'neon' },
+  neonYellow: { css: 'hue-rotate(30deg) saturate(2) brightness(1.1)', cat: 'neon' },
+  // Nature
   forest: { css: 'hue-rotate(30deg) saturate(1.3) brightness(0.95)', cat: 'nature' },
   ocean: { css: 'hue-rotate(190deg) saturate(1.4) brightness(1.05)', cat: 'nature' },
-  sunsetPro: { css: 'sepia(0.4) saturate(1.5) brightness(1.05) hue-rotate(-15deg)', cat: 'nature' }
+  desert: { css: 'sepia(0.4) saturate(1.3) brightness(1.05)', cat: 'nature' },
+  arctic: { css: 'hue-rotate(200deg) saturate(0.8) brightness(1.15)', cat: 'nature' },
+  jungle: { css: 'hue-rotate(70deg) saturate(1.4) contrast(1.1)', cat: 'nature' },
+  // Portrait
+  portrait: { css: 'brightness(1.05) saturate(1.1) contrast(1.05)', cat: 'portrait' },
+  soft: { css: 'brightness(1.08) saturate(0.95) contrast(0.95)', cat: 'portrait' },
+  glamour: { css: 'brightness(1.1) saturate(1.2) contrast(1.1)', cat: 'portrait' },
+  beauty: { css: 'brightness(1.05) saturate(1.1) sepia(0.05)', cat: 'portrait' }
 };
 
 const canvas = document.getElementById('canvas');
@@ -121,7 +143,7 @@ function applyFilters() {
   const brightness = f.brightness + (f.exposure * 0.5);
   const filterCss = FILTERS[state.currentFilter]?.css || '';
 
-  const filterStr = `brightness(${brightness}%) contrast(${f.contrast}%) saturate(${f.saturation}%) blur(${f.blur}px) hue-rotate(${f.hue}deg) sepia(${f.sepia}%) grayscale(${f.grayscale}%) ${filterCss}`.trim();
+  const filterStr = `brightness(${brightness}%) contrast(${f.contrast}%) saturate(${f.saturation}%) blur(${f.blur}px) hue-rotate(${f.hue}deg) sepia(${f.sepia}%) grayscale(${f.grayscale}%) invert(${f.invert}%) ${filterCss}`.trim();
 
   const imgW = originalImage._scaledW || originalImage.width;
   const imgH = originalImage._scaledH || originalImage.height;
@@ -146,7 +168,7 @@ function applyPixelEffects() {
   const f = state.filters;
   const needs = f.highlights || f.shadows || f.whites || f.blacks ||
                 f.temperature || f.tint || f.vibrance ||
-                f.sharpness || f.clarity || f.grain;
+                f.sharpness || f.clarity || f.texture || f.structure || f.grain;
   if (!needs) return;
 
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -182,6 +204,13 @@ function applyPixelEffects() {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
+  if (f.flare > 0) {
+    const grad = ctx.createRadialGradient(canvas.width*0.8, canvas.height*0.2, 0, canvas.width*0.8, canvas.height*0.2, canvas.width*0.5);
+    grad.addColorStop(0, `rgba(255,220,150,${f.flare/100*0.6})`);
+    grad.addColorStop(1, 'rgba(255,220,150,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 }
 
 function loadImage(src) {
@@ -207,43 +236,9 @@ function loadImage(src) {
   img.src = src;
 }
 
-// ---------- Upload Photo Modal ----------
-document.getElementById('dropZone')?.addEventListener('click', () => {
-  if (!originalImage) {
-    document.getElementById('sourceModal').classList.add('active');
-  }
-});
-
-document.getElementById('closeAppBtn')?.addEventListener('click', () => {
-  document.getElementById('sourceModal').classList.add('active');
-});
-
-document.getElementById('closeSource')?.addEventListener('click', () => {
-  document.getElementById('sourceModal').classList.remove('active');
-});
-
-document.getElementById('fromGallery')?.addEventListener('click', () => {
-  document.getElementById('sourceModal').classList.remove('active');
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => loadImage(ev.target.result);
-    reader.readAsDataURL(file);
-  };
-  input.click();
-});
-
-document.getElementById('fromCamera')?.addEventListener('click', () => {
-  document.getElementById('sourceModal').classList.remove('active');
-  document.getElementById('cameraModal').classList.add('active');
-  startCamera();
-});
-
-// ---------- Bottom Toolbar ----------
+// ============================================
+// BOTTOM TOOLBAR
+// ============================================
 document.querySelectorAll('.bt-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tool = btn.dataset.tool;
@@ -261,14 +256,32 @@ function openToolPanel(tool) {
   const content = document.getElementById('panelContent');
   const footer = document.getElementById('panelFooter');
 
-  // Clear
   tabs.innerHTML = '';
   content.innerHTML = '';
   footer.innerHTML = '';
 
-  const toolConfigs = {
+  const panels = {
+    adjust: {
+      title: 'Adjust',
+      tabs: ['Basic', 'Tone'],
+      content: {
+        'Basic': `
+          <div class="slider-group"><label><span>Brightness</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="${state.filters.brightness}"></div>
+          <div class="slider-group"><label><span>Contrast</span><span id="contrastVal">100%</span></label><input type="range" id="contrast" min="0" max="200" value="${state.filters.contrast}"></div>
+          <div class="slider-group"><label><span>Exposure</span><span id="exposureVal">0</span></label><input type="range" id="exposure" min="-100" max="100" value="${state.filters.exposure}"></div>
+          <div class="slider-group"><label><span>Saturation</span><span id="saturationVal">100%</span></label><input type="range" id="saturation" min="0" max="200" value="${state.filters.saturation}"></div>
+        `,
+        'Tone': `
+          <div class="slider-group"><label><span>Highlights</span><span id="highlightsVal">0</span></label><input type="range" id="highlights" min="-100" max="100" value="${state.filters.highlights}"></div>
+          <div class="slider-group"><label><span>Shadows</span><span id="shadowsVal">0</span></label><input type="range" id="shadows" min="-100" max="100" value="${state.filters.shadows}"></div>
+          <div class="slider-group"><label><span>Whites</span><span id="whitesVal">0</span></label><input type="range" id="whites" min="-100" max="100" value="${state.filters.whites}"></div>
+          <div class="slider-group"><label><span>Blacks</span><span id="blacksVal">0</span></label><input type="range" id="blacks" min="-100" max="100" value="${state.filters.blacks}"></div>
+        `
+      },
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
+    },
     crop: {
-      title: 'Crop',
+      title: 'Crop & Transform',
       tabs: [],
       content: `
         <div class="crop-ratios">
@@ -282,60 +295,79 @@ function openToolPanel(tool) {
           <button class="ratio-btn" data-ratio="2:3">2:3</button>
         </div>
         <div class="panel-actions-row">
-          <button class="action-btn" id="rotateLeft"><i class="fas fa-undo"></i> Rotate L</button>
-          <button class="action-btn" id="rotateRight"><i class="fas fa-redo"></i> Rotate R</button>
-          <button class="action-btn" id="flipHoriz"><i class="fas fa-exchange-alt"></i> Flip H</button>
-          <button class="action-btn" id="flipVert"><i class="fas fa-exchange-alt" style="transform:rotate(90deg)"></i> Flip V</button>
+          <button class="action-btn" id="rotateLeftBtn"><i class="fas fa-undo"></i> Rotate L</button>
+          <button class="action-btn" id="rotateRightBtn"><i class="fas fa-redo"></i> Rotate R</button>
+          <button class="action-btn" id="flipHBtn"><i class="fas fa-arrows-alt-h"></i> Flip H</button>
+          <button class="action-btn" id="flipVBtn"><i class="fas fa-arrows-alt-v"></i> Flip V</button>
         </div>
       `,
-      footer: `
-        <button class="btn-cancel" id="cancelToolBtn">Cancel</button>
-        <button class="btn-check" id="applyToolBtn"><i class="fas fa-check"></i> Apply</button>
-      `
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply Crop</button>`
     },
-    tools: {
-      title: 'Tools',
-      tabs: ['Light', 'Color', 'Detail', 'DSLR'],
-      tabContent: {
-        'Light': `
-          <div class="slider-group"><label><span>Brightness</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>
-          <div class="slider-group"><label><span>Contrast</span><span id="contrastVal">100%</span></label><input type="range" id="contrast" min="0" max="200" value="100"></div>
-          <div class="slider-group"><label><span>Exposure</span><span id="exposureVal">0</span></label><input type="range" id="exposure" min="-100" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Highlights</span><span id="highlightsVal">0</span></label><input type="range" id="highlights" min="-100" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Shadows</span><span id="shadowsVal">0</span></label><input type="range" id="shadows" min="-100" max="100" value="0"></div>
+    light: {
+      title: 'Light',
+      tabs: [],
+      content: `
+        <div class="slider-group"><label><span>Exposure</span><span id="exposureVal">0</span></label><input type="range" id="exposure" min="-100" max="100" value="${state.filters.exposure}"></div>
+        <div class="slider-group"><label><span>Brightness</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="${state.filters.brightness}"></div>
+        <div class="slider-group"><label><span>Contrast</span><span id="contrastVal">100%</span></label><input type="range" id="contrast" min="0" max="200" value="${state.filters.contrast}"></div>
+        <div class="slider-group"><label><span>Highlights</span><span id="highlightsVal">0</span></label><input type="range" id="highlights" min="-100" max="100" value="${state.filters.highlights}"></div>
+        <div class="slider-group"><label><span>Shadows</span><span id="shadowsVal">0</span></label><input type="range" id="shadows" min="-100" max="100" value="${state.filters.shadows}"></div>
+        <div class="slider-group"><label><span>Whites</span><span id="whitesVal">0</span></label><input type="range" id="whites" min="-100" max="100" value="${state.filters.whites}"></div>
+        <div class="slider-group"><label><span>Blacks</span><span id="blacksVal">0</span></label><input type="range" id="blacks" min="-100" max="100" value="${state.filters.blacks}"></div>
+      `,
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
+    },
+    color: {
+      title: 'Color',
+      tabs: ['Basic', 'Advanced'],
+      content: {
+        'Basic': `
+          <div class="slider-group"><label><span>Saturation</span><span id="saturationVal">100%</span></label><input type="range" id="saturation" min="0" max="200" value="${state.filters.saturation}"></div>
+          <div class="slider-group"><label><span>Vibrance</span><span id="vibranceVal">0</span></label><input type="range" id="vibrance" min="-100" max="100" value="${state.filters.vibrance}"></div>
+          <div class="slider-group"><label><span>Temperature</span><span id="temperatureVal">0</span></label><input type="range" id="temperature" min="-100" max="100" value="${state.filters.temperature}"></div>
+          <div class="slider-group"><label><span>Tint</span><span id="tintVal">0</span></label><input type="range" id="tint" min="-100" max="100" value="${state.filters.tint}"></div>
         `,
-        'Color': `
-          <div class="slider-group"><label><span>Saturation</span><span id="saturationVal">100%</span></label><input type="range" id="saturation" min="0" max="200" value="100"></div>
-          <div class="slider-group"><label><span>Vibrance</span><span id="vibranceVal">0</span></label><input type="range" id="vibrance" min="-100" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Temperature</span><span id="temperatureVal">0</span></label><input type="range" id="temperature" min="-100" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Tint</span><span id="tintVal">0</span></label><input type="range" id="tint" min="-100" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Hue</span><span id="hueVal">0°</span></label><input type="range" id="hue" min="0" max="360" value="0"></div>
-        `,
-        'Detail': `
-          <div class="slider-group"><label><span>Sharpness</span><span id="sharpnessVal">0</span></label><input type="range" id="sharpness" min="0" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Clarity</span><span id="clarityVal">0</span></label><input type="range" id="clarity" min="0" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Blur</span><span id="blurVal">0px</span></label><input type="range" id="blur" min="0" max="20" value="0"></div>
-          <div class="slider-group"><label><span>Grain</span><span id="grainVal">0</span></label><input type="range" id="grain" min="0" max="100" value="0"></div>
-        `,
-        'DSLR': `
-          <div class="slider-group"><label><span>Bokeh</span><span id="bokehVal">0</span></label><input type="range" id="bokeh" min="0" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Vignette</span><span id="vignetteVal">0</span></label><input type="range" id="vignette" min="0" max="100" value="0"></div>
-          <div class="slider-group"><label><span>Skin Smooth</span><span id="skinVal">0</span></label><input type="range" id="skin" min="0" max="100" value="0"></div>
-          <div class="panel-actions-row">
-            <button class="action-btn" id="hdrBtn"><i class="fas fa-sun"></i> HDR</button>
-            <button class="action-btn" id="portraitBtn"><i class="fas fa-user"></i> Portrait</button>
-          </div>
+        'Advanced': `
+          <div class="slider-group"><label><span>Hue</span><span id="hueVal">0°</span></label><input type="range" id="hue" min="0" max="360" value="${state.filters.hue}"></div>
+          <div class="slider-group"><label><span>Sepia</span><span id="sepiaVal">0%</span></label><input type="range" id="sepia" min="0" max="100" value="${state.filters.sepia}"></div>
+          <div class="slider-group"><label><span>Grayscale</span><span id="grayscaleVal">0%</span></label><input type="range" id="grayscale" min="0" max="100" value="${state.filters.grayscale}"></div>
+          <div class="slider-group"><label><span>Invert</span><span id="invertVal">0%</span></label><input type="range" id="invert" min="0" max="100" value="${state.filters.invert}"></div>
         `
       },
-      footer: `
-        <button class="btn-cancel" id="cancelToolBtn">Cancel</button>
-        <button class="btn-check" id="applyToolBtn"><i class="fas fa-check"></i> Apply</button>
-      `
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
+    },
+    tone: {
+      title: 'Tone Curve',
+      tabs: ['Levels', 'Gamma'],
+      content: {
+        'Levels': `
+          <div class="slider-group"><label><span>Black Point</span><span id="blackPointVal">0</span></label><input type="range" id="blackPoint" min="0" max="100" value="0"></div>
+          <div class="slider-group"><label><span>White Point</span><span id="whitePointVal">100</span></label><input type="range" id="whitePoint" min="0" max="255" value="255"></div>
+        `,
+        'Gamma': `
+          <div class="slider-group"><label><span>Gamma</span><span id="gammaVal">100%</span></label><input type="range" id="gamma" min="50" max="200" value="100"></div>
+        `
+      },
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
+    },
+    detail: {
+      title: 'Detail',
+      tabs: [],
+      content: `
+        <div class="slider-group"><label><span>Sharpness</span><span id="sharpnessVal">0</span></label><input type="range" id="sharpness" min="0" max="100" value="${state.filters.sharpness}"></div>
+        <div class="slider-group"><label><span>Clarity</span><span id="clarityVal">0</span></label><input type="range" id="clarity" min="0" max="100" value="${state.filters.clarity}"></div>
+        <div class="slider-group"><label><span>Texture</span><span id="textureVal">0</span></label><input type="range" id="texture" min="0" max="100" value="0"></div>
+        <div class="slider-group"><label><span>Dehaze</span><span id="dehazeVal">0</span></label><input type="range" id="dehaze" min="0" max="100" value="0"></div>
+        <div class="slider-group"><label><span>Structure</span><span id="structureVal">0</span></label><input type="range" id="structure" min="0" max="100" value="0"></div>
+        <div class="slider-group"><label><span>Blur</span><span id="blurVal">0px</span></label><input type="range" id="blur" min="0" max="20" value="0"></div>
+        <div class="slider-group"><label><span>Grain</span><span id="grainVal">0</span></label><input type="range" id="grain" min="0" max="100" value="${state.filters.grain}"></div>
+      `,
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     effects: {
       title: 'Effects',
-      tabs: ['Overlays', 'Style'],
-      tabContent: {
+      tabs: ['Overlays', 'Style', 'Light'],
+      content: {
         'Overlays': `
           <div class="effects-grid">
             <button class="effect-chip" data-effect="rain"><i class="fas fa-cloud-rain"></i> Rain</button>
@@ -352,110 +384,169 @@ function openToolPanel(tool) {
             <button class="effect-chip" data-effect="filmGrain"><i class="fas fa-braille"></i> Grain</button>
             <button class="effect-chip" data-effect="glow"><i class="fas fa-sun"></i> Glow</button>
             <button class="effect-chip" data-effect="mirror"><i class="fas fa-clone"></i> Mirror</button>
+            <button class="effect-chip" data-effect="dragan"><i class="fas fa-dragon"></i> Dragan</button>
+            <button class="effect-chip" data-effect="neonGlow"><i class="fas fa-bolt"></i> Neon</button>
+            <button class="effect-chip" data-effect="vhsGlitch"><i class="fas fa-tv"></i> VHS</button>
+            <button class="effect-chip" data-effect="lensFlare"><i class="fas fa-sun"></i> Flare</button>
+          </div>
+        `,
+        'Light': `
+          <div class="effects-grid">
             <button class="effect-chip" data-effect="sunrays"><i class="fas fa-sun"></i> Sunrays</button>
             <button class="effect-chip" data-effect="spotlight"><i class="fas fa-lightbulb"></i> Spotlight</button>
             <button class="effect-chip" data-effect="rainbow"><i class="fas fa-rainbow"></i> Rainbow</button>
             <button class="effect-chip" data-effect="stars"><i class="fas fa-star"></i> Stars</button>
-            <button class="effect-chip" data-effect="neonGlow"><i class="fas fa-bolt"></i> Neon</button>
-            <button class="effect-chip" data-effect="vhsGlitch"><i class="fas fa-tv"></i> VHS</button>
-            <button class="effect-chip" data-effect="lensFlare"><i class="fas fa-sun"></i> Flare</button>
-            <button class="effect-chip" data-effect="dragan"><i class="fas fa-dragon"></i> Dragan</button>
+            <button class="effect-chip" data-effect="bokehLight"><i class="fas fa-circle"></i> Bokeh Light</button>
+            <button class="effect-chip" data-effect="lensFlare"><i class="fas fa-sun"></i> Lens Flare</button>
           </div>
         `
       },
-      footer: `
-        <button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>
-      `
+      footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     filters: {
       title: 'Filters',
-      tabs: ['All', 'Cinematic', 'Vintage', 'Modern', 'B&W', 'Neon', 'Nature'],
-      tabContent: {
+      tabs: ['All', 'Cinematic', 'Vintage', 'Modern', 'B&W', 'Neon', 'Nature', 'Portrait'],
+      content: {
         'All': '<div class="filter-grid" id="filterGrid"></div>',
         'Cinematic': '<div class="filter-grid" id="filterGrid"></div>',
         'Vintage': '<div class="filter-grid" id="filterGrid"></div>',
         'Modern': '<div class="filter-grid" id="filterGrid"></div>',
         'B&W': '<div class="filter-grid" id="filterGrid"></div>',
         'Neon': '<div class="filter-grid" id="filterGrid"></div>',
-        'Nature': '<div class="filter-grid" id="filterGrid"></div>'
+        'Nature': '<div class="filter-grid" id="filterGrid"></div>',
+        'Portrait': '<div class="filter-grid" id="filterGrid"></div>'
       },
-      footer: `
-        <button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>
-      `
+      footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
+    },
+    portrait: {
+      title: 'Portrait',
+      tabs: ['Skin', 'Features'],
+      content: {
+        'Skin': `
+          <div class="slider-group"><label><span>Skin Smooth</span><span id="skinVal">0</span></label><input type="range" id="skin" min="0" max="100" value="0"></div>
+          <div class="slider-group"><label><span>Glow</span><span id="glowVal">0</span></label><input type="range" id="glow" min="0" max="100" value="0"></div>
+        `,
+        'Features': `
+          <div class="slider-group"><label><span>Teeth White</span><span id="teethVal">0</span></label><input type="range" id="teeth" min="0" max="100" value="0"></div>
+          <div class="slider-group"><label><span>Eye Brighten</span><span id="eyesVal">0</span></label><input type="range" id="eyes" min="0" max="100" value="0"></div>
+          <div class="slider-group"><label><span>Face Slim</span><span id="faceSlimVal">0</span></label><input type="range" id="faceSlim" min="0" max="100" value="0"></div>
+        `
+      },
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     retouch: {
       title: 'Retouch',
-      tabs: ['Skin', 'Eyes', 'Lips'],
-      tabContent: {
-        'Skin': `<div class="slider-group"><label><span>Smooth</span><span id="skinVal">0</span></label><input type="range" id="skin" min="0" max="100" value="0"></div>
-                 <div class="slider-group"><label><span>Brighten</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>`,
-        'Eyes': `<div class="slider-group"><label><span>Brighten</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>
-                 <div class="slider-group"><label><span>Sharpness</span><span id="sharpnessVal">0</span></label><input type="range" id="sharpness" min="0" max="100" value="0"></div>`,
-        'Lips': `<div class="slider-group"><label><span>Saturation</span><span id="saturationVal">100%</span></label><input type="range" id="saturation" min="0" max="200" value="100"></div>
-                 <div class="slider-group"><label><span>Brightness</span><span id="brightnessVal">100%</span></label><input type="range" id="brightness" min="0" max="200" value="100"></div>`
+      tabs: ['Heal', 'Smooth', 'Clone'],
+      content: {
+        'Heal': `<div class="effects-grid"><button class="effect-chip" data-effect="heal"><i class="fas fa-band-aid"></i> Heal</button></div>`,
+        'Smooth': `
+          <div class="slider-group"><label><span>Strength</span><span id="skinVal">0</span></label><input type="range" id="skin" min="0" max="100" value="0"></div>
+        `,
+        'Clone': `<div class="effects-grid"><button class="effect-chip" data-effect="clone"><i class="fas fa-clone"></i> Clone</button></div>`
       },
-      footer: `
-        <button class="btn-cancel" id="cancelToolBtn">Cancel</button>
-        <button class="btn-check" id="applyToolBtn">Apply</button>
-      `
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     removebg: {
-      title: 'Remove Background',
+      title: 'AI Remove Background',
       tabs: [],
       content: `
         <div style="text-align:center;padding:20px;">
           <i class="fas fa-robot" style="font-size:4rem;color:#8b5cf6;margin-bottom:20px;"></i>
           <h3 style="margin-bottom:10px;">AI Background Remover</h3>
-          <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:20px;">Removes background using AI. Works best with people photos.</p>
+          <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:20px;">Works best with people photos</p>
           <button class="btn-check" id="aiBgBtn" style="padding:15px 30px;font-size:1rem;"><i class="fas fa-magic"></i> Remove Background</button>
         </div>
       `,
       footer: ''
     },
-    sticker: {
-      title: 'Stickers',
-      tabs: [],
-      content: `<div class="sticker-grid" id="stickerGrid"></div>`,
-      footer: ''
+    draw: {
+      title: 'Draw',
+      tabs: ['Brush', 'Neon', 'Eraser'],
+      content: {
+        'Brush': `
+          <div class="slider-group"><label><span>Size</span><span id="brushSizeVal">15px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div>
+          <div class="effects-grid">
+            <button class="effect-chip draw-color" data-color="#ff0066" style="background:#ff0066;color:white;">●</button>
+            <button class="effect-chip draw-color" data-color="#ffffff" style="background:#fff;color:#000;">●</button>
+            <button class="effect-chip draw-color" data-color="#06b6d4" style="background:#06b6d4;color:white;">●</button>
+            <button class="effect-chip draw-color" data-color="#ec4899" style="background:#ec4899;color:white;">●</button>
+          </div>
+        `,
+        'Neon': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">15px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div>`,
+        'Eraser': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">15px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div>`
+      },
+      footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     text: {
-      title: 'Text',
+      title: 'Add Text',
       tabs: [],
       content: `
-        <input type="text" id="textInput" placeholder="Enter text..." class="modal-input">
-        <div class="modal-row">
-          <input type="color" id="textColor" value="#ffffff">
+        <input type="text" id="textInput" placeholder="Enter text..." style="width:100%;padding:12px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;font-family:inherit;">
+        <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;margin-bottom:12px;">
+          <input type="color" id="textColor" value="#ffffff" style="height:42px;padding:3px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;">
           <input type="range" id="textSize" min="10" max="200" value="48">
-          <select id="textFont">
+          <select id="textFont" style="padding:10px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;">
             <option value="Poppins">Poppins</option>
             <option value="Orbitron">Orbitron</option>
+            <option value="Playfair Display">Playfair</option>
             <option value="Arial">Arial</option>
             <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier</option>
           </select>
         </div>
+        <div class="effects-grid">
+          <button class="effect-chip" data-textstyle="bold"><i class="fas fa-bold"></i> Bold</button>
+          <button class="effect-chip" data-textstyle="italic"><i class="fas fa-italic"></i> Italic</button>
+          <button class="effect-chip" data-textstyle="shadow"><i class="fas fa-clone"></i> Shadow</button>
+          <button class="effect-chip" data-textstyle="outline"><i class="fas fa-square"></i> Outline</button>
+        </div>
       `,
-      footer: `
-        <button class="btn-check" id="addTextBtn" style="flex:1"><i class="fas fa-plus"></i> Add Text</button>
-      `
+      footer: `<button class="btn-check" id="addTextBtn" style="flex:1"><i class="fas fa-plus"></i> Add Text</button>`
+    },
+    sticker: {
+      title: 'Stickers',
+      tabs: ['Emojis', 'Shapes'],
+      content: {
+        'Emojis': `<div class="effects-grid" id="emojiGrid"></div>`,
+        'Shapes': `<div class="effects-grid" id="shapeGrid"></div>`
+      },
+      footer: ''
+    },
+    frame: {
+      title: 'Frames',
+      tabs: [],
+      content: `<div class="effects-grid" id="frameGrid"></div>`,
+      footer: ''
+    },
+    export: {
+      title: 'Export',
+      tabs: [],
+      content: `
+        <div class="slider-group"><label><span>Quality</span><span id="qualityVal">95%</span></label><input type="range" id="quality" min="10" max="100" value="95"></div>
+        <div class="panel-actions-row">
+          <button class="action-btn" id="exportPNG"><i class="fas fa-file-image"></i> PNG</button>
+          <button class="action-btn" id="exportJPG"><i class="fas fa-file-image"></i> JPG</button>
+        </div>
+      `,
+      footer: `<button class="btn-check" id="applyToolBtn" style="flex:1"><i class="fas fa-download"></i> Download</button>`
     }
   };
 
-  const config = toolConfigs[tool];
+  const config = panels[tool];
   if (!config) return;
 
   title.textContent = config.title;
+  footer.innerHTML = config.footer || '';
 
-  // Tabs
   if (config.tabs && config.tabs.length > 0) {
     config.tabs.forEach((tabName, idx) => {
       const t = document.createElement('button');
       t.className = 'ptab' + (idx === 0 ? ' active' : '');
       t.textContent = tabName;
-      t.dataset.tab = tabName;
       t.addEventListener('click', () => {
         document.querySelectorAll('.ptab').forEach(x => x.classList.remove('active'));
         t.classList.add('active');
-        content.innerHTML = config.tabContent[tabName];
+        content.innerHTML = typeof config.content === 'string' ? config.content : config.content[tabName];
         setTimeout(() => attachPanelHandlers(tool, tabName), 50);
       });
       tabs.appendChild(t);
@@ -465,21 +556,11 @@ function openToolPanel(tool) {
     tabs.style.display = 'none';
   }
 
-  // Content
-  if (config.content) {
-    content.innerHTML = config.content;
-  } else if (config.tabContent && config.tabs) {
-    content.innerHTML = config.tabContent[config.tabs[0]];
-  }
+  content.innerHTML = typeof config.content === 'string' ? config.content : (config.content[config.tabs ? config.tabs[0] : ''] || '');
 
-  // Footer
-  footer.innerHTML = config.footer || '';
-
-  // Show panel
   panel.classList.add('open');
   document.getElementById('panelOverlay').classList.add('active');
 
-  // Attach handlers
   setTimeout(() => attachPanelHandlers(tool, config.tabs ? config.tabs[0] : null), 100);
 }
 
@@ -488,11 +569,10 @@ function attachPanelHandlers(tool, activeTab) {
   const sliders = document.querySelectorAll('#panelContent input[type="range"]');
   sliders.forEach(input => {
     const id = input.id;
+    if (id === 'brushSize' || id === 'textSize' || id === 'quality') return;
     const valId = id + 'Val';
     const label = document.getElementById(valId);
-    if (!label) return;
-    
-    const suffix = id === 'hue' ? '°' : (id === 'blur' ? 'px' : (['brightness','contrast','saturation'].includes(id) ? '%' : ''));
+    const suffix = id === 'hue' ? '°' : (id === 'blur' ? 'px' : (['brightness','contrast','saturation','gamma'].includes(id) ? '%' : ''));
     
     input.value = state.filters[id] !== undefined ? state.filters[id] : input.value;
     if (label) label.textContent = input.value + suffix;
@@ -506,7 +586,7 @@ function attachPanelHandlers(tool, activeTab) {
     input.addEventListener('change', () => saveHistory());
   });
 
-  // Ratio buttons (Crop)
+  // Crop ratios
   document.querySelectorAll('.ratio-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if (!originalImage) return showToast('Upload image first!');
@@ -516,61 +596,63 @@ function attachPanelHandlers(tool, activeTab) {
     });
   });
 
-  // Rotate/Flip buttons
-  document.getElementById('rotateLeft')?.addEventListener('click', () => {
+  // Rotate/Flip
+  document.getElementById('rotateLeftBtn')?.addEventListener('click', () => {
     if (!originalImage) return;
     state.rotation = (state.rotation - 90 + 360) % 360;
     applyFilters(); saveHistory();
     showToast('Rotated ↺');
   });
-  document.getElementById('rotateRight')?.addEventListener('click', () => {
+  document.getElementById('rotateRightBtn')?.addEventListener('click', () => {
     if (!originalImage) return;
     state.rotation = (state.rotation + 90) % 360;
     applyFilters(); saveHistory();
     showToast('Rotated ↻');
   });
-  document.getElementById('flipHoriz')?.addEventListener('click', () => {
+  document.getElementById('flipHBtn')?.addEventListener('click', () => {
     if (!originalImage) return;
     state.flipH = !state.flipH;
     applyFilters(); saveHistory();
   });
-  document.getElementById('flipVert')?.addEventListener('click', () => {
+  document.getElementById('flipVBtn')?.addEventListener('click', () => {
     if (!originalImage) return;
     state.flipV = !state.flipV;
     applyFilters(); saveHistory();
   });
 
-  // HDR / Portrait
-  document.getElementById('hdrBtn')?.addEventListener('click', () => {
-    Object.assign(state.filters, { contrast: 130, saturation: 135, highlights: -25, shadows: 35, clarity: 40 });
-    applyFilters(); saveHistory();
-    showToast('HDR Boost! 🌅');
-  });
-  document.getElementById('portraitBtn')?.addEventListener('click', () => {
-    Object.assign(state.filters, { skin: 55, brightness: 108, vibrance: 20, highlights: -12 });
-    applyFilters(); saveHistory();
-    showToast('Portrait Mode! 👤');
-  });
-
   // Filters
   if (tool === 'filters') {
-    buildFilterPreviews(activeTab.toLowerCase());
+    const cat = activeTab ? activeTab.toLowerCase() : 'all';
+    buildFilterPreviews(cat);
   }
 
   // Effects
   document.querySelectorAll('.effect-chip').forEach(btn => {
-    btn.addEventListener('click', () => applySpecialEffect(btn.dataset.effect));
+    btn.addEventListener('click', () => {
+      if (btn.dataset.effect) applySpecialEffect(btn.dataset.effect);
+    });
+  });
+
+  // Draw colors
+  document.querySelectorAll('.draw-color').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.drawColor = btn.dataset.color;
+      showToast('Color set!');
+    });
   });
 
   // Stickers
   if (tool === 'sticker') buildStickers();
+
+  // Frame
+  if (tool === 'frame') buildFrames();
 
   // AI BG
   document.getElementById('aiBgBtn')?.addEventListener('click', removeBackgroundAI);
 
   // Text
   document.getElementById('addTextBtn')?.addEventListener('click', () => {
-    const text = document.getElementById('textInput').value;
+    const text = document.getElementById('textInput')?.value;
     if (!text) return showToast('Enter text!');
     const color = document.getElementById('textColor').value;
     const size = document.getElementById('textSize').value;
@@ -587,15 +669,18 @@ function attachPanelHandlers(tool, activeTab) {
     showToast('Text added ✍️');
   });
 
+  // Export
+  document.getElementById('exportPNG')?.addEventListener('click', () => downloadImage('png'));
+  document.getElementById('exportJPG')?.addEventListener('click', () => downloadImage('jpg'));
+
   // Apply/Cancel
   document.getElementById('applyToolBtn')?.addEventListener('click', () => {
+    if (tool === 'export') return downloadImage('png');
     saveHistory();
     closePanel();
     showToast('Applied ✓');
   });
-  document.getElementById('cancelToolBtn')?.addEventListener('click', () => {
-    closePanel();
-  });
+  document.getElementById('cancelToolBtn')?.addEventListener('click', closePanel);
 }
 
 function closePanel() {
@@ -606,7 +691,7 @@ function closePanel() {
 document.getElementById('panelClose')?.addEventListener('click', closePanel);
 document.getElementById('panelOverlay')?.addEventListener('click', closePanel);
 
-// ---------- Filter Previews ----------
+// Filter previews
 function buildFilterPreviews(cat = 'all') {
   const grid = document.getElementById('filterGrid');
   if (!grid) return;
@@ -641,30 +726,111 @@ function buildFilterPreviews(cat = 'all') {
   });
 }
 
-// ---------- Stickers ----------
-const STICKERS = ['😀','😎','🤩','😍','🥰','😂','🤣','😇','🥳','😜','🌟','⭐','✨','💫','🌈','❤️','💖','💝','🔥','💯','🎉','🎊','🎈','🎁','🌸','🌺','🌻','🍕','🍔','🍟','☕','🎵','🎸','⚡','💎','👑','🎯','🏆','📸','🎬'];
+// Stickers
+const EMOJIS = ['😀','😎','🤩','😍','🥰','😂','🤣','😇','🥳','😜','🤔','😴','😢','😡','🤯','😱','🥺','😈','👻','💀','🤖','🌟','⭐','✨','💫','🌈','❤️','💖','💝','💘','🔥','💯','🎉','🎊','🎈','🎁','🌸','🌺','🌻','🌹','🍕','🍔','🍟','☕','🍺','🎵','🎸','🎬','⚡','💎','👑','🎯','🏆','📸'];
+
+const SHAPES = ['⬛','⬜','🟥','🟦','🟩','🟨','🟪','🟧','⚫','⚪','🔴','🔵','🟢','🟡','🟣','🟠','❤️','💛','💚','💙','💜','🧡','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝'];
 
 function buildStickers() {
-  const grid = document.getElementById('stickerGrid');
+  const emojiGrid = document.getElementById('emojiGrid');
+  const shapeGrid = document.getElementById('shapeGrid');
+  
+  if (emojiGrid) {
+    emojiGrid.innerHTML = '';
+    EMOJIS.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'effect-chip';
+      btn.style.fontSize = '1.8rem';
+      btn.textContent = s;
+      btn.addEventListener('click', () => addSticker(s));
+      emojiGrid.appendChild(btn);
+    });
+  }
+  if (shapeGrid) {
+    shapeGrid.innerHTML = '';
+    SHAPES.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'effect-chip';
+      btn.style.fontSize = '1.8rem';
+      btn.textContent = s;
+      btn.addEventListener('click', () => addSticker(s));
+      shapeGrid.appendChild(btn);
+    });
+  }
+}
+
+function addSticker(s) {
+  if (!originalImage) return showToast('Upload image first!');
+  ctx.font = `${Math.min(canvas.width, canvas.height) * 0.15}px serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(s, canvas.width/2 + (Math.random()-0.5)*canvas.width*0.5, canvas.height/2 + (Math.random()-0.5)*canvas.height*0.5);
+  saveHistory();
+  closePanel();
+  showToast('Sticker added 😀');
+}
+
+// Frames
+const FRAMES = [
+  { name: 'White', style: 'white' },
+  { name: 'Black', style: 'black' },
+  { name: 'Gold', style: 'gold' },
+  { name: 'Neon', style: 'neon' },
+  { name: 'Polaroid', style: 'polaroid' },
+  { name: 'Shadow', style: 'shadow' },
+  { name: 'Vintage', style: 'vintage' },
+  { name: 'Double', style: 'double' }
+];
+
+function buildFrames() {
+  const grid = document.getElementById('frameGrid');
   if (!grid) return;
   grid.innerHTML = '';
-  STICKERS.forEach(s => {
-    const div = document.createElement('div');
-    div.className = 'sticker-item';
-    div.textContent = s;
-    div.addEventListener('click', () => {
-      ctx.font = `${Math.min(canvas.width, canvas.height) * 0.15}px serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText(s, canvas.width/2 + (Math.random()-0.5)*canvas.width*0.5, canvas.height/2 + (Math.random()-0.5)*canvas.height*0.5);
+  FRAMES.forEach(fr => {
+    const btn = document.createElement('button');
+    btn.className = 'effect-chip';
+    btn.innerHTML = `<i class="fas fa-square"></i> ${fr.name}`;
+    btn.addEventListener('click', () => {
+      if (!originalImage) return showToast('Upload image first!');
+      applyFrame(fr.style);
       saveHistory();
-      closePanel();
-      showToast('Sticker added 😀');
+      showToast(`Frame: ${fr.name} 🖼️`);
     });
-    grid.appendChild(div);
+    grid.appendChild(btn);
   });
 }
 
-// ---------- Effects ----------
+function applyFrame(style) {
+  const pad = 30;
+  const temp = document.createElement('canvas');
+  temp.width = canvas.width; temp.height = canvas.height;
+  temp.getContext('2d').drawImage(canvas, 0, 0);
+  const newW = canvas.width + pad * 2;
+  const newH = canvas.height + pad * 2;
+  canvas.width = newW; canvas.height = newH;
+  const colors = { white: '#ffffff', black: '#000000', gold: '#d4af37', neon: '#ff00ff', polaroid: '#f5f5f0', shadow: '#1a1a1a', vintage: '#3d2817', double: '#000' };
+  ctx.fillStyle = colors[style] || '#ffffff';
+  ctx.fillRect(0, 0, newW, newH);
+  if (style === 'neon') { ctx.shadowColor = '#ff00ff'; ctx.shadowBlur = 25; }
+  if (style === 'shadow') { ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 30; }
+  if (style === 'gold') {
+    const g = ctx.createLinearGradient(0, 0, newW, newH);
+    g.addColorStop(0, '#d4af37'); g.addColorStop(0.5, '#fff4b0'); g.addColorStop(1, '#d4af37');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, newW, newH);
+  }
+  if (style === 'double') {
+    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4;
+    ctx.strokeRect(8, 8, newW - 16, newH - 16);
+  }
+  ctx.drawImage(temp, pad, pad);
+  ctx.shadowColor = 'transparent';
+  if (style === 'polaroid') {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, newW, 70);
+    ctx.fillRect(0, newH - 90, newW, 90);
+  }
+}
+
+// Effects
 function applySpecialEffect(effect) {
   if (!originalImage) return showToast('Upload image first!');
   const w = canvas.width, h = canvas.height;
@@ -751,6 +917,10 @@ function applySpecialEffect(effect) {
     half.getContext('2d').drawImage(canvas, 0, 0, w/2, h, 0, 0, w/2, h);
     ctx.save(); ctx.scale(-1, 1); ctx.drawImage(half, -w, 0); ctx.restore();
   }
+  else if (effect === 'dragan') {
+    Object.assign(state.filters, { clarity: 60, contrast: 125, saturation: 85, shadows: -20 });
+    applyFilters();
+  }
   else if (effect === 'sunrays') {
     const cx = w*0.7, cy = 0;
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, w);
@@ -833,16 +1003,12 @@ function applySpecialEffect(effect) {
     g.addColorStop(1, 'rgba(255, 150, 50, 0)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
-  else if (effect === 'dragan') {
-    Object.assign(state.filters, { clarity: 60, contrast: 125, saturation: 85, shadows: -20 });
-    applyFilters();
-  }
 
   saveHistory();
   showToast(`${effect} ✨`);
 }
 
-// ---------- Crop ----------
+// Crop
 let cropState = { active: false, x: 0, y: 0, w: 0, h: 0, ratio: 'free' };
 
 function startCrop(ratio) {
@@ -852,13 +1018,11 @@ function startCrop(ratio) {
   overlay.width = canvas.width;
   overlay.height = canvas.height;
   overlay.classList.add('active');
-  let w = canvas.width * 0.7;
-  let h = canvas.height * 0.7;
+  let w = canvas.width * 0.7, h = canvas.height * 0.7;
   if (cropState.ratio !== 'free') {
     const [rw, rh] = cropState.ratio.split(':').map(Number);
     const r = rw / rh;
-    if (w / h > r) w = h * r;
-    else h = w / r;
+    if (w / h > r) w = h * r; else h = w / r;
   }
   cropState.x = (canvas.width - w) / 2;
   cropState.y = (canvas.height - h) / 2;
@@ -891,19 +1055,20 @@ function drawCropOverlay() {
   }
 }
 
-// ---------- AI BG ----------
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'z') { e.preventDefault(); doUndo(); }
+  if (e.ctrlKey && e.key === 'y') { e.preventDefault(); doRedo(); }
+});
+
+// AI BG
 async function removeBackgroundAI() {
   if (!originalImage) return showToast('Upload image first!');
   if (typeof bodyPix === 'undefined') return showToast('AI loading... wait');
   const loading = document.getElementById('aiLoading');
-  const progress = document.getElementById('aiProgress');
   loading.classList.add('active');
-  progress.textContent = 'Loading AI model...';
   try {
     const net = await bodyPix.load({ architecture: 'MobileNetV1', outputStride: 16, multiplier: 0.75, quantBytes: 2 });
-    progress.textContent = 'Detecting...';
     const segmentation = await net.segmentPerson(canvas, { internalResolution: 'medium', segmentationThreshold: 0.7 });
-    progress.textContent = 'Removing BG...';
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const d = imgData.data, mask = segmentation.data;
     for (let i = 0; i < mask.length; i++) {
@@ -938,7 +1103,7 @@ async function removeBackgroundAI() {
   }
 }
 
-// ---------- Camera ----------
+// Camera
 const cameraModal = document.getElementById('cameraModal');
 const video = document.getElementById('video');
 let stream = null;
@@ -965,15 +1130,51 @@ function closeCamera() {
   if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
 }
 
-// ---------- Download & Share ----------
-document.getElementById('downloadBtn')?.addEventListener('click', () => {
+// Source modal
+document.getElementById('closeAppBtn')?.addEventListener('click', () => {
+  document.getElementById('sourceModal').classList.add('active');
+});
+
+document.getElementById('dropZone')?.addEventListener('click', () => {
+  if (!originalImage) document.getElementById('sourceModal').classList.add('active');
+});
+
+document.getElementById('closeSource')?.addEventListener('click', () => {
+  document.getElementById('sourceModal').classList.remove('active');
+});
+
+document.getElementById('fromGallery')?.addEventListener('click', () => {
+  document.getElementById('sourceModal').classList.remove('active');
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => loadImage(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+  input.click();
+});
+
+document.getElementById('fromCamera')?.addEventListener('click', () => {
+  document.getElementById('sourceModal').classList.remove('active');
+  cameraModal.classList.add('active');
+  startCamera();
+});
+
+// Download & Share
+function downloadImage(format = 'png') {
   if (!originalImage) return showToast('Upload image first!');
   const link = document.createElement('a');
-  link.download = `AVR-Pro-Studios-${Date.now()}.png`;
-  link.href = canvas.toDataURL('image/png', 1.0);
+  link.download = `AVR-Photo-Edits-${Date.now()}.${format}`;
+  link.href = canvas.toDataURL(`image/${format}`, 0.95);
   link.click();
   showToast('Saved! 💾');
-});
+}
+
+document.getElementById('downloadBtn')?.addEventListener('click', () => downloadImage('png'));
 
 document.getElementById('shareBtn')?.addEventListener('click', async () => {
   if (!originalImage) return showToast('Upload image first!');
@@ -981,20 +1182,14 @@ document.getElementById('shareBtn')?.addEventListener('click', async () => {
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
     const file = new File([blob], 'avr-photo.png', { type: 'image/png' });
     if (navigator.share) {
-      await navigator.share({ files: [file], title: 'AVR PRO STUDIOS' });
+      await navigator.share({ files: [file], title: 'AVR PHOTO EDITS' });
     } else {
       showToast('Share not supported');
     }
   } catch(e) {}
 });
 
-// ---------- Init ----------
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'z') { e.preventDefault(); doUndo(); }
-  if (e.ctrlKey && e.key === 'y') { e.preventDefault(); doRedo(); }
-});
-
 updateUndoRedoUI();
 
-console.log('%c AVR PRO STUDIOS v7.0 ', 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 20px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
-console.log('%c Picsart-Style Bottom Toolbar 🎨📸', 'color: #06b6d4; font-size: 14px;');
+console.log('%c AVR PHOTO EDITS v8.0 ', 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 20px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
+console.log('%c 50+ Pro Tools Loaded 📸🚀', 'color: #06b6d4; font-size: 14px;');
