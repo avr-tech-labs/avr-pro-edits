@@ -1,6 +1,7 @@
 /* ============================================
    PRO'S EDITS — v1.0 by AVR TECH LABS
    150+ Features, Filters, Effects & Styles
+   Fixed Gallery Upload for All Devices
    ============================================ */
 
 window.addEventListener('load', () => {
@@ -34,7 +35,7 @@ const state = {
   selectedTextStyle: 'neon'
 };
 
-// NEW FILTERS ADDED (Total 50+ Filters)
+// 50+ Filters
 const FILTERS = {
   original: { css: '', cat: 'all' },
   cinematic: { css: 'contrast(1.2) saturate(1.1) hue-rotate(-10deg)', cat: 'cinematic' },
@@ -1107,7 +1108,7 @@ function buildFilterPreviews(cat = 'all') {
   });
 }
 
-// NEW STICKERS ARRAY
+// STICKERS
 const EMOJIS = ['😀','😎','🤩','😍','🥰','😂','🤣','😇','🥳','😜','🤔','😴','😢','😡','🤯','😱','🥺','😈','👻','💀','🤖','🌟','⭐','✨','💫','🌈','❤️','💖','💝','💘','🔥','💯','🎉','🎊','🎈','🎁','🌸','🌺','🌻','🌹','🍕','🍔','🍟','☕','🍺','🎵','🎸','🎬','⚡','💎','👑','🎯','🏆','📸'];
 const SHAPES = ['⬛','⬜','🟥','🟦','🟩','🟨','🟪','🟧','⚫','⚪','🔴','🔵','🟢','🟡','🟣','🟠','❤️','💛','💚','💙','💜','🧡','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝'];
 const SYMBOLS = ['©','®','™','✔','✖','♠','♣','♥','♦','☮','☯','☪','✡','☸','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','🎶','🔔','💡','📍','📌','🔗','✂','🖊','🔒','🔑','⚙','⚡','☀','☁','☂','❄','✨','⭐','🌟'];
@@ -1140,7 +1141,6 @@ function addSticker(s) {
   bakeToOriginal(); saveHistory(); closePanel(); showToast('Sticker added');
 }
 
-// NEW FRAMES ARRAYS
 const FRAMES_SIMPLE = [
   { name: 'White', style: 'white' }, { name: 'Black', style: 'black' },
   { name: 'Grey', style: 'grey' }, { name: 'Gold', style: 'gold' }, 
@@ -1806,12 +1806,47 @@ function closeCamera() { cameraModal.classList.remove('active'); if (stream) { s
 document.getElementById('closeAppBtn')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.add('active'); });
 document.getElementById('dropZone')?.addEventListener('click', () => { if (!originalImage) document.getElementById('sourceModal').classList.add('active'); });
 document.getElementById('closeSource')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.remove('active'); });
+
+// FIXED GALLERY UPLOAD FOR ALL MOBILES
 document.getElementById('fromGallery')?.addEventListener('click', () => {
   document.getElementById('sourceModal').classList.remove('active');
-  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
-  input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => loadImage(ev.target.result); reader.readAsDataURL(file); };
-  input.click();
+  
+  // కొన్ని మొబైల్స్ లో input.click() డైరెక్ట్ గా పనిచేయదు, అందుకే DOM లో యాడ్ చేస్తున్నాం
+  let fileInput = document.getElementById('hiddenFileInput');
+  if (!fileInput) {
+    fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'hiddenFileInput';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // ఫైల్ సైజ్ చెక్ (Max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        showToast('Photo is too large (Max 50MB)');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        loadImage(ev.target.result);
+        fileInput.value = ''; // రీసెట్
+      };
+      reader.onerror = () => {
+        showToast('Failed to read file. Try another photo.');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  // మొబైల్ బ్రౌజర్స్ కి ట్రిగ్గర్ చేయడానికి
+  fileInput.click();
 });
+
 document.getElementById('fromCamera')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.remove('active'); cameraModal.classList.add('active'); startCamera(); });
 
 document.addEventListener('keydown', (e) => {
