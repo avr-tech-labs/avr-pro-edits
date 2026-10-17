@@ -1,6 +1,6 @@
 /* ============================================
    PRO'S EDITS — v1.0 by AVR TECH LABS
-   Cleaned & Fully Bug-Fixed
+   Universal All-Device & Offline Compatible
    ============================================ */
 
 window.addEventListener('load', () => {
@@ -1324,8 +1324,8 @@ function applySpecialEffect(effect) {
       if (Math.random() > 0.85) {
         const shift = Math.floor((Math.random() - 0.5) * 30);
         for (let x = 0; x < w; x++) {
-          const srcX = Math.max(0, Math.min(w-1, x + shift));
-          const idx = (y*w + x)*4, sIdx = (y*w + srcX)*4;
+          const srcX = Math.max(0, minX => minX, x + shift);
+          const idx = (y*w + x)*4, sIdx = (y*w + Math.max(0, Math.min(w-1, x + shift)))*4;
           d[idx] = d[sIdx]; d[idx+1] = d[sIdx+1]; d[idx+2] = d[sIdx+2];
         }
       }
@@ -1884,7 +1884,7 @@ document.getElementById('closeSource')?.addEventListener('click', () => {
 });
 
 // =======================================================
-// REALME & ANDROID COMPATIBLE FILE UPLOAD HANDLER
+// UNIVERSAL ALL-DEVICE & OFFLINE COMPATIBLE UPLOADER
 // =======================================================
 const hiddenInput = document.getElementById('hiddenFileInput');
 const galleryBtn = document.getElementById('fromGalleryBtn');
@@ -1897,23 +1897,50 @@ galleryBtn?.addEventListener('click', () => {
   }
 });
 
+function processAndLoadImage(sourceData) {
+  const img = new Image();
+  img.onload = () => {
+    loadImage(sourceData);
+  };
+  img.onerror = () => {
+    showToast('Photo format support cheyaledu!');
+  };
+  img.src = sourceData;
+}
+
+function fallbackToBlob(file) {
+  try {
+    const blobUrl = URL.createObjectURL(file);
+    processAndLoadImage(blobUrl);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  } catch (err) {
+    showToast('Photo load cheyadamlo issue vachindi!');
+  }
+}
+
 if (hiddenInput) {
   hiddenInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('దయచేసి సరైన ఫోటోను ఎంచుకోండి');
-      return;
-    }
+    showToast('Photo loading... ⏳');
 
-    try {
-      const blobUrl = URL.createObjectURL(file);
-      loadImage(blobUrl);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
-    } catch (err) {
-      showToast('ఫోటో లోడ్ చేయడంలో ఎర్రర్ వచ్చింది');
-    }
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const dataUrl = event.target.result;
+      if (dataUrl) {
+        processAndLoadImage(dataUrl);
+      } else {
+        fallbackToBlob(file);
+      }
+    };
+
+    reader.onerror = () => {
+      fallbackToBlob(file);
+    };
+
+    reader.readAsDataURL(file);
   });
 }
 
