@@ -11,6 +11,9 @@
 </head>
 <body>
 
+<!-- REALME/IPHONE FIX: హిడెన్ ఫైల్ ఇన్పుట్ -->
+<input type="file" id="hiddenFileInput" accept="image/*" style="display: none;">
+
 <!-- Splash -->
 <div id="splash" class="splash">
   <div class="logo-scene">
@@ -47,7 +50,6 @@
       </h1>
       <h2 class="studios-line">EDITS</h2>
       <p class="tagline-line">by AVR TECH LABS</p>
-      <!-- VERSION 1.0 ADD CHESANU -->
       <div style="margin-top: 10px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; letter-spacing: 2px; color: #06b6d4; text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);">VERSION 1.0</div>
     </div>
   </div>
@@ -156,7 +158,11 @@
   <div class="modal-content">
     <h2><i class="fas fa-plus"></i> Add Photo</h2>
     <div class="source-grid">
-      <button class="source-btn" id="fromGallery"><i class="fas fa-image"></i><span>Gallery</span></button>
+      <!-- ఇక్కడ label వాడుతున్నాం, ఇది iOS మరియు Android రెండింటిలో పనిచేస్తుంది -->
+      <label for="hiddenFileInput" class="source-btn" id="fromGalleryLabel">
+        <i class="fas fa-image"></i><span>Gallery</span>
+      </label>
+      
       <button class="source-btn" id="fromCamera"><i class="fas fa-camera"></i><span>Camera</span></button>
     </div>
     <div class="modal-actions">
