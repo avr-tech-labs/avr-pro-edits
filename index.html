@@ -11,7 +11,6 @@
 </head>
 <body>
 
-<!-- REALME/IPHONE FIX: హిడెన్ ఫైల్ ఇన్పుట్ -->
 <input type="file" id="hiddenFileInput" accept="image/*" style="display: none;">
 
 <!-- Splash -->
@@ -121,7 +120,6 @@
   <button class="bt-btn" data-tool="sticker"><div class="bt-icon"><i class="fas fa-smile"></i></div><span>Sticker</span></button>
   <button class="bt-btn" data-tool="frame"><div class="bt-icon"><i class="fas fa-square"></i></div><span>Frame</span></button>
   <button class="bt-btn" data-tool="shadow"><div class="bt-icon"><i class="fas fa-clone"></i></div><span>Shadow</span></button>
-  <button class="bt-btn" data-tool="collage"><div class="bt-icon"><i class="fas fa-th"></i></div><span>Collage</span></button>
   <button class="bt-btn" data-tool="watermark"><div class="bt-icon"><i class="fas fa-copyright"></i></div><span>Watermark</span></button>
   <button class="bt-btn" data-tool="export"><div class="bt-icon"><i class="fas fa-file-export"></i></div><span>Export</span></button>
 </nav>
@@ -158,11 +156,9 @@
   <div class="modal-content">
     <h2><i class="fas fa-plus"></i> Add Photo</h2>
     <div class="source-grid">
-      <!-- ఇక్కడ label వాడుతున్నాం, ఇది iOS మరియు Android రెండింటిలో పనిచేస్తుంది -->
       <label for="hiddenFileInput" class="source-btn" id="fromGalleryLabel">
         <i class="fas fa-image"></i><span>Gallery</span>
       </label>
-      
       <button class="source-btn" id="fromCamera"><i class="fas fa-camera"></i><span>Camera</span></button>
     </div>
     <div class="modal-actions">
