@@ -11,6 +11,7 @@
 </head>
 <body>
 
+<!-- Hidden File Input -->
 <input type="file" id="hiddenFileInput" accept="image/*" style="display: none;">
 
 <!-- Splash -->
@@ -151,15 +152,17 @@
   </div>
 </div>
 
-<!-- Source Modal -->
+<!-- Source Modal (Realme/Android Touch-Safe Fix: label బదులుగా button ఉపయోగించాం) -->
 <div id="sourceModal" class="modal">
   <div class="modal-content">
     <h2><i class="fas fa-plus"></i> Add Photo</h2>
     <div class="source-grid">
-      <label for="hiddenFileInput" class="source-btn" id="fromGalleryLabel">
+      <button type="button" class="source-btn" id="fromGalleryBtn">
         <i class="fas fa-image"></i><span>Gallery</span>
-      </label>
-      <button class="source-btn" id="fromCamera"><i class="fas fa-camera"></i><span>Camera</span></button>
+      </button>
+      <button type="button" class="source-btn" id="fromCamera">
+        <i class="fas fa-camera"></i><span>Camera</span>
+      </button>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" id="closeSource">Cancel</button>
