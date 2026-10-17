@@ -1,7 +1,7 @@
 /* ============================================
    PRO'S EDITS — v1.0 by AVR TECH LABS
    150+ Features, Filters, Effects & Styles
-   Fixed Gallery Upload for All Devices
+   100% Android & iOS Compatible
    ============================================ */
 
 window.addEventListener('load', () => {
@@ -35,7 +35,6 @@ const state = {
   selectedTextStyle: 'neon'
 };
 
-// 50+ Filters
 const FILTERS = {
   original: { css: '', cat: 'all' },
   cinematic: { css: 'contrast(1.2) saturate(1.1) hue-rotate(-10deg)', cat: 'cinematic' },
@@ -1108,7 +1107,6 @@ function buildFilterPreviews(cat = 'all') {
   });
 }
 
-// STICKERS
 const EMOJIS = ['😀','😎','🤩','😍','🥰','😂','🤣','😇','🥳','😜','🤔','😴','😢','😡','🤯','😱','🥺','😈','👻','💀','🤖','🌟','⭐','✨','💫','🌈','❤️','💖','💝','💘','🔥','💯','🎉','🎊','🎈','🎁','🌸','🌺','🌻','🌹','🍕','🍔','🍟','☕','🍺','🎵','🎸','🎬','⚡','💎','👑','🎯','🏆','📸'];
 const SHAPES = ['⬛','⬜','🟥','🟦','🟩','🟨','🟪','🟧','⚫','⚪','🔴','🔵','🟢','🟡','🟣','🟠','❤️','💛','💚','💙','💜','🧡','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝'];
 const SYMBOLS = ['©','®','™','✔','✖','♠','♣','♥','♦','☮','☯','☪','✡','☸','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','🎶','🔔','💡','📍','📌','🔗','✂','🖊','🔒','🔑','⚙','⚡','☀','☁','☂','❄','✨','⭐','🌟'];
@@ -1807,45 +1805,34 @@ document.getElementById('closeAppBtn')?.addEventListener('click', () => { docume
 document.getElementById('dropZone')?.addEventListener('click', () => { if (!originalImage) document.getElementById('sourceModal').classList.add('active'); });
 document.getElementById('closeSource')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.remove('active'); });
 
-// FIXED GALLERY UPLOAD FOR ALL MOBILES
-document.getElementById('fromGallery')?.addEventListener('click', () => {
-  document.getElementById('sourceModal').classList.remove('active');
-  
-  // కొన్ని మొబైల్స్ లో input.click() డైరెక్ట్ గా పనిచేయదు, అందుకే DOM లో యాడ్ చేస్తున్నాం
-  let fileInput = document.getElementById('hiddenFileInput');
-  if (!fileInput) {
-    fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.id = 'hiddenFileInput';
-    fileInput.accept = 'image/*';
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
+// =======================================================
+// 100% Android & iOS FIX - hiddenFileInput Handle
+// =======================================================
+const hiddenInput = document.getElementById('hiddenFileInput');
+if (hiddenInput) {
+  hiddenInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // క్లోజ్ చేయడానికి మోడల్
+    document.getElementById('sourceModal').classList.remove('active');
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      // ఫైల్ సైజ్ చెక్ (Max 50MB)
-      if (file.size > 50 * 1024 * 1024) {
-        showToast('Photo is too large (Max 50MB)');
-        return;
-      }
+    if (file.size > 50 * 1024 * 1024) {
+      showToast('Photo is too large (Max 50MB)');
+      return;
+    }
 
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        loadImage(ev.target.result);
-        fileInput.value = ''; // రీసెట్
-      };
-      reader.onerror = () => {
-        showToast('Failed to read file. Try another photo.');
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-  
-  // మొబైల్ బ్రౌజర్స్ కి ట్రిగ్గర్ చేయడానికి
-  fileInput.click();
-});
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      loadImage(ev.target.result);
+      hiddenInput.value = ''; // రీసెట్
+    };
+    reader.onerror = () => {
+      showToast('Failed to read file. Try another photo.');
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 document.getElementById('fromCamera')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.remove('active'); cameraModal.classList.add('active'); startCamera(); });
 
