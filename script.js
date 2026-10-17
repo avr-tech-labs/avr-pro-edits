@@ -1,12 +1,12 @@
 /* ============================================
-   AVR PHOTO EDITS — v9.0 ULTRA
-   80+ Tools · Full Working
+   PRO'S EDITS — v10.0 by AVR TECH LABS
+   80+ Tools · Resizable Crop · 20+ Text Styles
    ============================================ */
 
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('splash')?.classList.add('hide');
-    showToast('Welcome to AVR PHOTO EDITS v9.0! 🎨🚀');
+    showToast("PRO'S EDITS · AVR TECH LABS 🚀");
   }, 3200);
 });
 
@@ -30,27 +30,23 @@ const state = {
   compareMode: false,
   drawColor: '#ff0066',
   drawSize: 15,
-  skyTheme: 'original'
+  selectedTextStyle: 'neon'
 };
 
-/* -------------------- FILTERS -------------------- */
 const FILTERS = {
   original: { css: '', cat: 'all' },
-  // Cinematic
   cinematic: { css: 'contrast(1.2) saturate(1.1) hue-rotate(-10deg)', cat: 'cinematic' },
   teal: { css: 'contrast(1.15) saturate(1.1) hue-rotate(-15deg)', cat: 'cinematic' },
   netflix: { css: 'contrast(1.2) saturate(1.1) brightness(0.92) hue-rotate(-5deg)', cat: 'cinematic' },
   moody: { css: 'contrast(1.25) brightness(0.85) saturate(0.85)', cat: 'cinematic' },
   blockbuster: { css: 'contrast(1.3) saturate(1.15) hue-rotate(-10deg) brightness(0.95)', cat: 'cinematic' },
   matrix: { css: 'contrast(1.2) hue-rotate(80deg) saturate(0.9)', cat: 'cinematic' },
-  // Vintage
   vintage: { css: 'sepia(0.4) contrast(1.1) brightness(0.95)', cat: 'vintage' },
   retro: { css: 'sepia(0.6) contrast(1.15) saturate(0.8)', cat: 'vintage' },
   polaroid: { css: 'sepia(0.25) contrast(1.15) brightness(1.05)', cat: 'vintage' },
   faded: { css: 'contrast(0.85) brightness(1.1) saturate(0.7) sepia(0.15)', cat: 'vintage' },
   kodak: { css: 'saturate(1.3) contrast(1.1) sepia(0.15)', cat: 'vintage' },
   lomo: { css: 'contrast(1.3) saturate(1.5) hue-rotate(-5deg)', cat: 'vintage' },
-  // Modern
   vivid: { css: 'saturate(1.8) contrast(1.2)', cat: 'modern' },
   hdr: { css: 'contrast(1.3) saturate(1.4) brightness(1.05)', cat: 'modern' },
   dramatic: { css: 'contrast(1.5) brightness(0.9) saturate(0.8)', cat: 'modern' },
@@ -59,25 +55,21 @@ const FILTERS = {
   cool: { css: 'hue-rotate(180deg) saturate(1.2)', cat: 'modern' },
   sunset: { css: 'sepia(0.5) saturate(1.6) hue-rotate(-20deg)', cat: 'modern' },
   cyberpunk: { css: 'hue-rotate(280deg) saturate(1.8) contrast(1.2)', cat: 'modern' },
-  // B&W
   bw: { css: 'grayscale(1) contrast(1.2)', cat: 'bw' },
   noir: { css: 'grayscale(1) contrast(1.5) brightness(0.9)', cat: 'bw' },
   highKey: { css: 'grayscale(1) brightness(1.3) contrast(0.9)', cat: 'bw' },
   lowKey: { css: 'grayscale(1) brightness(0.7) contrast(1.4)', cat: 'bw' },
   silvertone: { css: 'grayscale(0.9) contrast(1.1) sepia(0.15)', cat: 'bw' },
-  // Neon
   neonPink: { css: 'hue-rotate(-60deg) saturate(2) contrast(1.2) brightness(1.1)', cat: 'neon' },
   neonBlue: { css: 'hue-rotate(180deg) saturate(2.5) contrast(1.3)', cat: 'neon' },
   neonPurple: { css: 'hue-rotate(250deg) saturate(2) contrast(1.2)', cat: 'neon' },
   neonGreen: { css: 'hue-rotate(90deg) saturate(2.2) contrast(1.2)', cat: 'neon' },
   neonYellow: { css: 'hue-rotate(30deg) saturate(2) brightness(1.1)', cat: 'neon' },
-  // Nature
   forest: { css: 'hue-rotate(30deg) saturate(1.3) brightness(0.95)', cat: 'nature' },
   ocean: { css: 'hue-rotate(190deg) saturate(1.4) brightness(1.05)', cat: 'nature' },
   desert: { css: 'sepia(0.4) saturate(1.3) brightness(1.05)', cat: 'nature' },
   arctic: { css: 'hue-rotate(200deg) saturate(0.8) brightness(1.15)', cat: 'nature' },
   jungle: { css: 'hue-rotate(70deg) saturate(1.4) contrast(1.1)', cat: 'nature' },
-  // Portrait
   portrait: { css: 'brightness(1.05) saturate(1.1) contrast(1.05)', cat: 'portrait' },
   soft: { css: 'brightness(1.08) saturate(0.95) contrast(0.95)', cat: 'portrait' },
   glamour: { css: 'brightness(1.1) saturate(1.2) contrast(1.1)', cat: 'portrait' },
@@ -90,7 +82,6 @@ const drawLayer = document.getElementById('drawLayer');
 const dctx = drawLayer.getContext('2d');
 let originalImage = null;
 
-/* -------------------- UTILS -------------------- */
 function showToast(msg) {
   const t = document.getElementById('toast');
   if (!t) return;
@@ -148,11 +139,9 @@ function doRedo() {
 document.getElementById('undoBtn')?.addEventListener('click', doUndo);
 document.getElementById('redoBtn')?.addEventListener('click', doRedo);
 
-/* -------------------- CORE RENDER -------------------- */
 function applyFilters() {
   if (!originalImage) return;
   if (state.compareMode) {
-    // Show original untouched
     const imgW = originalImage._scaledW || originalImage.width;
     const imgH = originalImage._scaledH || originalImage.height;
     canvas.width = imgW; canvas.height = imgH;
@@ -160,20 +149,15 @@ function applyFilters() {
     ctx.drawImage(originalImage, 0, 0, imgW, imgH);
     return;
   }
-
   const f = state.filters;
   const brightness = f.brightness + (f.exposure * 0.5);
   const filterCss = FILTERS[state.currentFilter]?.css || '';
-
   const filterStr = `brightness(${brightness}%) contrast(${f.contrast}%) saturate(${f.saturation}%) blur(${f.blur}px) hue-rotate(${f.hue}deg) sepia(${f.sepia}%) grayscale(${f.grayscale}%) invert(${f.invert}%) ${filterCss}`.trim();
-
   const imgW = originalImage._scaledW || originalImage.width;
   const imgH = originalImage._scaledH || originalImage.height;
   const isRotated90 = state.rotation === 90 || state.rotation === 270;
-
   if (isRotated90) { canvas.width = imgH; canvas.height = imgW; }
   else { canvas.width = imgW; canvas.height = imgH; }
-
   ctx.save();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -182,7 +166,6 @@ function applyFilters() {
   ctx.filter = filterStr;
   ctx.drawImage(originalImage, -imgW / 2, -imgH / 2, imgW, imgH);
   ctx.restore();
-
   applyPixelEffects();
   applyOverlays();
 }
@@ -192,30 +175,23 @@ function applyPixelEffects() {
   const hasCurve = state.curvePoints.length > 2 ||
     state.curvePoints[0].x !== 0 || state.curvePoints[0].y !== 1 ||
     state.curvePoints[1].x !== 1 || state.curvePoints[1].y !== 0;
-
   const needs = f.highlights || f.shadows || f.whites || f.blacks ||
                 f.temperature || f.tint || f.vibrance ||
                 f.sharpness || f.clarity || f.texture || f.structure || f.grain ||
                 f.dehaze || f.skin || f.teeth || f.eyes ||
                 f.hslR || f.hslG || f.hslB || f.hslC || f.hslM || f.hslY || f.hslLum ||
-                f.blackPoint || f.whitePoint !== 255 || hasCurve ||
-                f.gamma !== 100;
-
+                f.blackPoint || f.whitePoint !== 255 || hasCurve || f.gamma !== 100;
   if (!needs) return;
-
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const d = imgData.data;
   const tempR = f.temperature * 0.5, tempB = -f.temperature * 0.5;
   const tintG = -f.tint * 0.5, tintR = f.tint * 0.3, tintB = f.tint * 0.3;
-
-  // Precompute curve LUT
   let lut = null;
   if (hasCurve) {
     lut = new Uint8Array(256);
     const pts = state.curvePoints.slice().sort((a,b) => a.x - b.x);
     for (let i = 0; i < 256; i++) {
       const t = i / 255;
-      // Linear interpolation between sorted points
       let y = t;
       for (let p = 0; p < pts.length - 1; p++) {
         if (t >= pts[p].x && t <= pts[p+1].x) {
@@ -227,102 +203,63 @@ function applyPixelEffects() {
       lut[i] = Math.max(0, Math.min(255, Math.round((1 - y) * 255)));
     }
   }
-
   const bp = f.blackPoint, wp = f.whitePoint;
   const gamma = f.gamma / 100;
-
   for (let i = 0; i < d.length; i += 4) {
     let r = d[i], g = d[i+1], b = d[i+2];
-
-    // Temperature/Tint
     r += tempR + tintR; g += tintG; b += tempB + tintB;
-
-    // Levels
     if (bp || wp !== 255) {
       r = ((r - bp) / (wp - bp)) * 255;
       g = ((g - bp) / (wp - bp)) * 255;
       b = ((b - bp) / (wp - bp)) * 255;
     }
-
-    // Gamma
     if (gamma !== 1) {
       r = Math.pow(Math.max(0,r)/255, gamma) * 255;
       g = Math.pow(Math.max(0,g)/255, gamma) * 255;
       b = Math.pow(Math.max(0,b)/255, gamma) * 255;
     }
-
-    // Highlights/Shadows/Whites/Blacks
     const lum = 0.299*r + 0.587*g + 0.114*b;
     if (f.highlights && lum > 128) { const a = ((lum-128)/127)*f.highlights*0.8; r+=a; g+=a; b+=a; }
     if (f.shadows && lum < 128) { const a = ((128-lum)/128)*f.shadows*0.8; r+=a; g+=a; b+=a; }
     if (f.whites && lum > 200) { const a = f.whites*0.5; r+=a; g+=a; b+=a; }
     if (f.blacks && lum < 50) { const a = f.blacks*0.5; r+=a; g+=a; b+=a; }
-
-    // Vibrance
     if (f.vibrance) {
       const max = Math.max(r,g,b), min = Math.min(r,g,b);
       const a = (1-(max-min)/255)*f.vibrance*0.5;
       const avg = (r+g+b)/3;
       r += (r-avg)*a/100; g += (g-avg)*a/100; b += (b-avg)*a/100;
     }
-
-    // HSL per color range
     if (f.hslR || f.hslG || f.hslB || f.hslC || f.hslM || f.hslY || f.hslLum) {
       const [h,s,l] = rgbToHsl(r,g,b);
-      let nh = h, ns = s;
-      if (h < 30 || h > 330) { ns += f.hslR; }
-      else if (h < 90) { ns += f.hslY; }
-      else if (h < 150) { ns += f.hslG; }
-      else if (h < 210) { ns += f.hslC; }
-      else if (h < 270) { ns += f.hslB; }
-      else { ns += f.hslM; }
+      let ns = s;
+      if (h < 30 || h > 330) ns += f.hslR;
+      else if (h < 90) ns += f.hslY;
+      else if (h < 150) ns += f.hslG;
+      else if (h < 210) ns += f.hslC;
+      else if (h < 270) ns += f.hslB;
+      else ns += f.hslM;
       ns += f.hslLum;
-      const [nr, ng, nb] = hslToRgb(nh, Math.max(0, Math.min(100, ns)), l);
+      const [nr, ng, nb] = hslToRgb(h, Math.max(0, Math.min(100, ns)), l);
       r = nr; g = ng; b = nb;
     }
-
-    // Skin tone smoothing (very basic warm boost)
-    if (f.skin) {
-      if (r > g && g > b && r > 90 && r - b > 20) {
-        const soft = f.skin / 100;
-        r += 8 * soft; g += 4 * soft;
-      }
-    }
-    // Teeth whitening (whites in low sat)
-    if (f.teeth) {
-      const max = Math.max(r,g,b), min = Math.min(r,g,b);
-      if (max > 180 && (max-min) < 40) {
-        const boost = f.teeth * 0.25;
-        r += boost; g += boost; b += boost;
-      }
-    }
-    // Eyes brighten (dark regions)
-    if (f.eyes) {
-      if (lum < 70) { const a = f.eyes * 0.15; r+=a; g+=a; b+=a; }
-    }
-
-    // Curve
+    if (f.skin) { if (r > g && g > b && r > 90 && r - b > 20) { const soft = f.skin / 100; r += 8 * soft; g += 4 * soft; } }
+    if (f.teeth) { const max = Math.max(r,g,b), min = Math.min(r,g,b); if (max > 180 && (max-min) < 40) { const boost = f.teeth * 0.25; r += boost; g += boost; b += boost; } }
+    if (f.eyes) { if (lum < 70) { const a = f.eyes * 0.15; r+=a; g+=a; b+=a; } }
     if (lut) {
       r = lut[Math.max(0, Math.min(255, Math.round(r)))];
       g = lut[Math.max(0, Math.min(255, Math.round(g)))];
       b = lut[Math.max(0, Math.min(255, Math.round(b)))];
     }
-
-    // Grain
     if (f.grain) { const n = (Math.random()-0.5)*f.grain*0.8; r+=n; g+=n; b+=n; }
-
     d[i] = Math.max(0, Math.min(255, r));
     d[i+1] = Math.max(0, Math.min(255, g));
     d[i+2] = Math.max(0, Math.min(255, b));
   }
   ctx.putImageData(imgData, 0, 0);
-
-  // Post-processing: clarity (unsharp-like), sharpness
   if (f.clarity || f.sharpness || f.texture || f.structure) {
     applySharpen(f.clarity * 0.4 + f.sharpness * 0.4 + f.structure * 0.3 + f.texture * 0.3);
   }
   if (f.dehaze) {
-    // simple contrast boost + slight saturation
     const imgData2 = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const d2 = imgData2.data;
     const k = 1 + f.dehaze / 100;
@@ -442,7 +379,6 @@ function hslToRgb(h, s, l) {
   return [r*255, g*255, b*255];
 }
 
-/* -------------------- LOAD IMAGE -------------------- */
 function loadImage(src) {
   const img = new Image();
   img.onload = () => {
@@ -455,8 +391,6 @@ function loadImage(src) {
     }
     originalImage._scaledW = w;
     originalImage._scaledH = h;
-
-    // Reset state
     Object.keys(state.filters).forEach(k => {
       state.filters[k] = (k === 'brightness' || k === 'contrast' || k === 'saturation' || k === 'gamma' || k === 'whitePoint') ? (k === 'whitePoint' ? 255 : 100) : 0;
     });
@@ -464,7 +398,6 @@ function loadImage(src) {
     state.rotation = 0; state.flipH = false; state.flipV = false;
     state.curvePoints = [{x: 0, y: 1}, {x: 1, y: 0}];
     state.history = []; state.historyIndex = -1;
-
     canvas.width = w; canvas.height = h;
     applyFilters();
     document.getElementById('dropZone').classList.add('hide');
@@ -474,7 +407,6 @@ function loadImage(src) {
   img.src = src;
 }
 
-/* -------------------- TOOLBAR -------------------- */
 document.querySelectorAll('.bt-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tool = btn.dataset.tool;
@@ -488,7 +420,6 @@ document.querySelectorAll('.bt-btn').forEach(btn => {
 function closePanel() {
   document.getElementById('panel').classList.remove('open');
   document.getElementById('panelOverlay').classList.remove('active');
-  // Turn off draw mode when closing
   if (state.currentTool === 'draw') {
     drawLayer.classList.remove('active');
   }
@@ -497,23 +428,18 @@ function closePanel() {
 document.getElementById('panelClose')?.addEventListener('click', closePanel);
 document.getElementById('panelOverlay')?.addEventListener('click', closePanel);
 
-/* -------------------- PANEL DEFINITIONS -------------------- */
 function openToolPanel(tool) {
   const panel = document.getElementById('panel');
   const title = document.getElementById('panelTitle');
   const tabs = document.getElementById('panelTabs');
   const content = document.getElementById('panelContent');
   const footer = document.getElementById('panelFooter');
-
   tabs.innerHTML = ''; content.innerHTML = ''; footer.innerHTML = '';
-
   const panels = buildPanels();
   const config = panels[tool];
   if (!config) return;
-
   title.textContent = config.title;
   footer.innerHTML = config.footer || '';
-
   if (config.tabs && config.tabs.length > 0) {
     config.tabs.forEach((tabName, idx) => {
       const t = document.createElement('button');
@@ -531,12 +457,9 @@ function openToolPanel(tool) {
   } else {
     tabs.style.display = 'none';
   }
-
   content.innerHTML = typeof config.content === 'string' ? config.content : (config.content[config.tabs ? config.tabs[0] : ''] || '');
-
   panel.classList.add('open');
   document.getElementById('panelOverlay').classList.add('active');
-
   setTimeout(() => attachPanelHandlers(tool, config.tabs ? config.tabs[0] : null), 100);
 }
 
@@ -545,11 +468,37 @@ function slider(id, label, min, max, suffix = '') {
   return `<div class="slider-group"><label><span>${label}</span><span id="${id}Val">${val}${suffix}</span></label><input type="range" id="${id}" min="${min}" max="${max}" value="${val}"></div>`;
 }
 
+const TEXT_STYLES = [
+  { id: 'plain', name: 'Plain', cls: '', font: 'Poppins', fill: '#ffffff', shadow: false },
+  { id: 'neon', name: 'Neon', cls: 'neon', font: 'Poppins', fill: '#00ffff', shadow: true, glow: '#00ffff' },
+  { id: 'gold', name: 'Gold', cls: 'gold', font: 'Poppins', fill: '#d4af37', gradient: true },
+  { id: 'fire', name: 'Fire', cls: 'fire', font: 'Poppins', fill: '#ff6600', gradient: true },
+  { id: 'ice', name: 'Ice', cls: 'ice', font: 'Poppins', fill: '#a0f0ff', gradient: true },
+  { id: 'rainbow', name: 'Rainbow', cls: 'rainbow', font: 'Poppins', fill: '#ff00ff', rainbow: true },
+  { id: 'retro', name: 'Retro', cls: 'retro', font: 'Pacifico', fill: '#ff6b9d' },
+  { id: 'monoton', name: 'Monoton', cls: 'monoton', font: 'Monoton', fill: '#ff00ff' },
+  { id: 'lobster', name: 'Lobster', cls: 'lobster', font: 'Lobster', fill: '#ffdd00' },
+  { id: 'bebas', name: 'Bebas', cls: 'bebas', font: 'Bebas Neue', fill: '#ffffff' },
+  { id: 'righteous', name: 'Righteous', cls: 'righteous', font: 'Righteous', fill: '#06b6d4' },
+  { id: 'audiowide', name: 'Audiowide', cls: 'audiowide', font: 'Audiowide', fill: '#8b5cf6' },
+  { id: 'shadow', name: 'Shadow', cls: 'shadow', font: 'Poppins', fill: '#ffffff' },
+  { id: 'outline', name: 'Outline', cls: 'outline', font: 'Poppins', fill: '#ffffff', stroke: '#ffffff' },
+  { id: 'glow', name: 'Glow', cls: 'glow', font: 'Poppins', fill: '#ffffff', glow: '#ec4899' },
+  { id: 'threed', name: '3D', cls: 'three-d', font: 'Poppins', fill: '#ffffff', three_d: true },
+  { id: 'stroke', name: 'Stroke', cls: 'stroke', font: 'Poppins', fill: '#ffffff', strokeColor: '#000', strokeWidth: 4 },
+  { id: 'shine', name: 'Shine', cls: 'shine', font: 'Poppins', fill: '#ffffff', shine: true },
+  { id: 'chrome', name: 'Chrome', cls: 'chrome', font: 'Poppins', fill: '#ffffff', chrome: true },
+  { id: 'purple-glow', name: 'Purple Glow', cls: 'purple-glow', font: 'Poppins', fill: '#e0aaff', glow: '#8b5cf6' },
+  { id: 'matrix', name: 'Matrix', cls: 'green-matrix', font: 'Orbitron', fill: '#00ff41', glow: '#00ff41' },
+  { id: 'red-fire', name: 'Red Fire', cls: 'red-fire', font: 'Poppins', fill: '#f44336', gradient: true },
+  { id: 'emboss', name: 'Emboss', cls: 'emboss', font: 'Poppins', fill: '#b0b0b0', emboss: true },
+  { id: 'emboss2', name: 'Offset', cls: 'emboss2', font: 'Poppins', fill: '#ffffff', offsetShadow: true }
+];
+
 function buildPanels() {
   return {
     adjust: {
-      title: 'Adjust',
-      tabs: ['Basic', 'Advanced'],
+      title: 'Adjust', tabs: ['Basic', 'Advanced'],
       content: {
         'Basic': slider('brightness','Brightness',0,200,'%') + slider('contrast','Contrast',0,200,'%') + slider('exposure','Exposure',-100,100) + slider('saturation','Saturation',0,200,'%'),
         'Advanced': slider('vibrance','Vibrance',-100,100) + slider('temperature','Temperature',-100,100) + slider('tint','Tint',-100,100) + slider('hue','Hue',0,360,'°') + slider('sepia','Sepia',0,100,'%') + slider('grayscale','Grayscale',0,100,'%')
@@ -557,49 +506,42 @@ function buildPanels() {
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     light: {
-      title: 'Light',
-      tabs: [],
+      title: 'Light', tabs: [],
       content: slider('exposure','Exposure',-100,100) + slider('brightness','Brightness',0,200,'%') + slider('contrast','Contrast',0,200,'%') + slider('highlights','Highlights',-100,100) + slider('shadows','Shadows',-100,100) + slider('whites','Whites',-100,100) + slider('blacks','Blacks',-100,100),
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     color: {
-      title: 'Color',
-      tabs: ['Basic','HSL'],
+      title: 'Color', tabs: ['Basic','HSL'],
       content: {
         'Basic': slider('saturation','Saturation',0,200,'%') + slider('vibrance','Vibrance',-100,100) + slider('temperature','Temperature',-100,100) + slider('tint','Tint',-100,100) + slider('hue','Hue',0,360,'°'),
-        'HSL': `<p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;">Adjust specific color ranges</p>` + slider('hslR','Red Saturation',-100,100) + slider('hslY','Yellow Sat',-100,100) + slider('hslG','Green Sat',-100,100) + slider('hslC','Cyan Sat',-100,100) + slider('hslB','Blue Sat',-100,100) + slider('hslM','Magenta Sat',-100,100) + slider('hslLum','Overall Sat Boost',-100,100)
+        'HSL': slider('hslR','Red Saturation',-100,100) + slider('hslY','Yellow Sat',-100,100) + slider('hslG','Green Sat',-100,100) + slider('hslC','Cyan Sat',-100,100) + slider('hslB','Blue Sat',-100,100) + slider('hslM','Magenta Sat',-100,100) + slider('hslLum','Overall Sat Boost',-100,100)
       },
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     detail: {
-      title: 'Detail',
-      tabs: [],
+      title: 'Detail', tabs: [],
       content: slider('sharpness','Sharpness',0,100) + slider('clarity','Clarity',0,100) + slider('texture','Texture',0,100) + slider('dehaze','Dehaze',0,100) + slider('structure','Structure',0,100) + slider('blur','Blur',0,20,'px') + slider('grain','Grain',0,100),
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     tone: {
-      title: 'Tone',
-      tabs: [],
+      title: 'Tone', tabs: [],
       content: slider('blackPoint','Black Point',0,100) + slider('whitePoint','White Point',0,255) + slider('gamma','Gamma',50,200,'%') + slider('vignette','Vignette',0,100) + slider('flare','Flare',0,100),
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     curve: {
-      title: 'Curves',
-      tabs: [],
+      title: 'Curves', tabs: [],
       content: `<div class="curve-editor"><canvas id="curveCanvas" width="300" height="200"></canvas></div>
         <p style="font-size:0.7rem;color:var(--text-dim);text-align:center;">Tap/drag to add points · Drag points to move</p>
         <div class="panel-actions-row"><button class="action-btn" id="curveResetBtn"><i class="fas fa-undo"></i> Reset Curve</button></div>`,
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     hsl: {
-      title: 'HSL',
-      tabs: [],
+      title: 'HSL', tabs: [],
       content: slider('hslR','Red',-100,100) + slider('hslY','Yellow',-100,100) + slider('hslG','Green',-100,100) + slider('hslC','Cyan',-100,100) + slider('hslB','Blue',-100,100) + slider('hslM','Magenta',-100,100) + slider('hslLum','Master',-100,100),
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     crop: {
-      title: 'Crop & Transform',
-      tabs: [],
+      title: 'Crop & Resize', tabs: [],
       content: `
         <div class="crop-ratios">
           <button class="ratio-btn active" data-ratio="free">Free</button>
@@ -617,101 +559,40 @@ function buildPanels() {
           <button class="action-btn" id="flipHBtn"><i class="fas fa-arrows-alt-h"></i> Flip H</button>
           <button class="action-btn" id="flipVBtn"><i class="fas fa-arrows-alt-v"></i> Flip V</button>
         </div>
-        <p style="font-size:0.7rem;color:var(--text-dim);text-align:center;margin-top:10px;">Drag on canvas to select crop area</p>
+        <p style="font-size:0.7rem;color:var(--text-dim);text-align:center;margin-top:10px;">✨ Drag corners/edges to resize · Drag inside to move</p>
       `,
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyCropBtn">Apply Crop</button>`
     },
     perspective: {
-      title: 'Perspective',
-      tabs: [],
-      content: `
-        <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Adjust corner distortion</p>
-        ${slider('perspTl','Top Left',-100,100)}
-        ${slider('perspTr','Top Right',-100,100)}
-        ${slider('perspBl','Bottom Left',-100,100)}
-        ${slider('perspBr','Bottom Right',-100,100)}
-      `,
+      title: 'Perspective', tabs: [],
+      content: slider('perspTl','Top Left',-100,100) + slider('perspTr','Top Right',-100,100) + slider('perspBl','Bottom Left',-100,100) + slider('perspBr','Bottom Right',-100,100),
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyPerspBtn">Apply</button>`
     },
     filters: {
-      title: 'Filters',
-      tabs: ['All', 'Cinematic', 'Vintage', 'Modern', 'B&W', 'Neon', 'Nature', 'Portrait'],
-      content: {
-        'All': '<div class="filter-grid" id="filterGrid"></div>',
-        'Cinematic': '<div class="filter-grid" id="filterGrid"></div>',
-        'Vintage': '<div class="filter-grid" id="filterGrid"></div>',
-        'Modern': '<div class="filter-grid" id="filterGrid"></div>',
-        'B&W': '<div class="filter-grid" id="filterGrid"></div>',
-        'Neon': '<div class="filter-grid" id="filterGrid"></div>',
-        'Nature': '<div class="filter-grid" id="filterGrid"></div>',
-        'Portrait': '<div class="filter-grid" id="filterGrid"></div>'
-      },
+      title: 'Filters', tabs: ['All', 'Cinematic', 'Vintage', 'Modern', 'B&W', 'Neon', 'Nature', 'Portrait'],
+      content: { 'All': '<div class="filter-grid" id="filterGrid"></div>', 'Cinematic': '<div class="filter-grid" id="filterGrid"></div>', 'Vintage': '<div class="filter-grid" id="filterGrid"></div>', 'Modern': '<div class="filter-grid" id="filterGrid"></div>', 'B&W': '<div class="filter-grid" id="filterGrid"></div>', 'Neon': '<div class="filter-grid" id="filterGrid"></div>', 'Nature': '<div class="filter-grid" id="filterGrid"></div>', 'Portrait': '<div class="filter-grid" id="filterGrid"></div>' },
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     effects: {
-      title: 'Effects',
-      tabs: ['Weather', 'Style', 'Light', 'Vintage'],
+      title: 'Effects', tabs: ['Weather', 'Style', 'Light', 'Vintage'],
       content: {
-        'Weather': `
-          <div class="effects-grid">
-            <button class="effect-chip" data-effect="rain"><i class="fas fa-cloud-rain"></i> Rain</button>
-            <button class="effect-chip" data-effect="snow"><i class="fas fa-snowflake"></i> Snow</button>
-            <button class="effect-chip" data-effect="confetti"><i class="fas fa-birthday-cake"></i> Confetti</button>
-            <button class="effect-chip" data-effect="fire"><i class="fas fa-fire"></i> Fire</button>
-            <button class="effect-chip" data-effect="sparkle"><i class="fas fa-star"></i> Sparkle</button>
-            <button class="effect-chip" data-effect="fog"><i class="fas fa-smog"></i> Fog</button>
-            <button class="effect-chip" data-effect="lensFlare"><i class="fas fa-sun"></i> Flare</button>
-          </div>`,
-        'Style': `
-          <div class="effects-grid">
-            <button class="effect-chip" data-effect="glitch"><i class="fas fa-tv"></i> Glitch</button>
-            <button class="effect-chip" data-effect="mirror"><i class="fas fa-clone"></i> Mirror</button>
-            <button class="effect-chip" data-effect="dragan"><i class="fas fa-dragon"></i> Dragan</button>
-            <button class="effect-chip" data-effect="neonGlow"><i class="fas fa-bolt"></i> Neon</button>
-            <button class="effect-chip" data-effect="vhs"><i class="fas fa-video"></i> VHS</button>
-            <button class="effect-chip" data-effect="sketch"><i class="fas fa-pencil"></i> Sketch</button>
-            <button class="effect-chip" data-effect="cartoon"><i class="fas fa-paint-brush"></i> Cartoon</button>
-            <button class="effect-chip" data-effect="oilPaint"><i class="fas fa-palette"></i> Oil Paint</button>
-          </div>`,
-        'Light': `
-          <div class="effects-grid">
-            <button class="effect-chip" data-effect="sunrays"><i class="fas fa-sun"></i> Sunrays</button>
-            <button class="effect-chip" data-effect="spotlight"><i class="fas fa-lightbulb"></i> Spotlight</button>
-            <button class="effect-chip" data-effect="rainbow"><i class="fas fa-rainbow"></i> Rainbow</button>
-            <button class="effect-chip" data-effect="stars"><i class="fas fa-star"></i> Stars</button>
-            <button class="effect-chip" data-effect="bokeh"><i class="fas fa-circle"></i> Bokeh</button>
-            <button class="effect-chip" data-effect="lightLeak"><i class="fas fa-sun"></i> Light Leak</button>
-          </div>`,
-        'Vintage': `
-          <div class="effects-grid">
-            <button class="effect-chip" data-effect="grainOld"><i class="fas fa-braille"></i> Old Grain</button>
-            <button class="effect-chip" data-effect="scratch"><i class="fas fa-minus"></i> Scratches</button>
-            <button class="effect-chip" data-effect="faded"><i class="fas fa-sun"></i> Faded</button>
-            <button class="effect-chip" data-effect="sepiaTone"><i class="fas fa-coffee"></i> Sepia</button>
-            <button class="effect-chip" data-effect="dustSpots"><i class="fas fa-ellipsis-h"></i> Dust</button>
-          </div>`
+        'Weather': `<div class="effects-grid"><button class="effect-chip" data-effect="rain"><i class="fas fa-cloud-rain"></i> Rain</button><button class="effect-chip" data-effect="snow"><i class="fas fa-snowflake"></i> Snow</button><button class="effect-chip" data-effect="confetti"><i class="fas fa-birthday-cake"></i> Confetti</button><button class="effect-chip" data-effect="fire"><i class="fas fa-fire"></i> Fire</button><button class="effect-chip" data-effect="sparkle"><i class="fas fa-star"></i> Sparkle</button><button class="effect-chip" data-effect="fog"><i class="fas fa-smog"></i> Fog</button><button class="effect-chip" data-effect="lensFlare"><i class="fas fa-sun"></i> Flare</button></div>`,
+        'Style': `<div class="effects-grid"><button class="effect-chip" data-effect="glitch"><i class="fas fa-tv"></i> Glitch</button><button class="effect-chip" data-effect="mirror"><i class="fas fa-clone"></i> Mirror</button><button class="effect-chip" data-effect="dragan"><i class="fas fa-dragon"></i> Dragan</button><button class="effect-chip" data-effect="neonGlow"><i class="fas fa-bolt"></i> Neon</button><button class="effect-chip" data-effect="vhs"><i class="fas fa-video"></i> VHS</button><button class="effect-chip" data-effect="sketch"><i class="fas fa-pencil"></i> Sketch</button><button class="effect-chip" data-effect="cartoon"><i class="fas fa-paint-brush"></i> Cartoon</button><button class="effect-chip" data-effect="oilPaint"><i class="fas fa-palette"></i> Oil Paint</button></div>`,
+        'Light': `<div class="effects-grid"><button class="effect-chip" data-effect="sunrays"><i class="fas fa-sun"></i> Sunrays</button><button class="effect-chip" data-effect="spotlight"><i class="fas fa-lightbulb"></i> Spotlight</button><button class="effect-chip" data-effect="rainbow"><i class="fas fa-rainbow"></i> Rainbow</button><button class="effect-chip" data-effect="stars"><i class="fas fa-star"></i> Stars</button><button class="effect-chip" data-effect="bokeh"><i class="fas fa-circle"></i> Bokeh</button><button class="effect-chip" data-effect="lightLeak"><i class="fas fa-sun"></i> Light Leak</button></div>`,
+        'Vintage': `<div class="effects-grid"><button class="effect-chip" data-effect="grainOld"><i class="fas fa-braille"></i> Old Grain</button><button class="effect-chip" data-effect="scratch"><i class="fas fa-minus"></i> Scratches</button><button class="effect-chip" data-effect="faded"><i class="fas fa-sun"></i> Faded</button><button class="effect-chip" data-effect="sepiaTone"><i class="fas fa-coffee"></i> Sepia</button><button class="effect-chip" data-effect="dustSpots"><i class="fas fa-ellipsis-h"></i> Dust</button></div>`
       },
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     blur: {
-      title: 'Blur',
-      tabs: ['Tools', 'Advanced'],
+      title: 'Blur', tabs: ['Tools', 'Advanced'],
       content: {
-        'Tools': `
-          <div class="effects-grid">
-            <button class="effect-chip" data-effect="tiltShift"><i class="fas fa-arrows-alt-v"></i> Tilt Shift</button>
-            <button class="effect-chip" data-effect="radialBlur"><i class="fas fa-circle-notch"></i> Radial</button>
-            <button class="effect-chip" data-effect="motionBlur"><i class="fas fa-arrows-alt-h"></i> Motion</button>
-            <button class="effect-chip" data-effect="zoomBlur"><i class="fas fa-search-plus"></i> Zoom</button>
-            <button class="effect-chip" data-effect="gaussianBlur"><i class="fas fa-water"></i> Gaussian</button>
-          </div>`,
+        'Tools': `<div class="effects-grid"><button class="effect-chip" data-effect="tiltShift"><i class="fas fa-arrows-alt-v"></i> Tilt Shift</button><button class="effect-chip" data-effect="radialBlur"><i class="fas fa-circle-notch"></i> Radial</button><button class="effect-chip" data-effect="motionBlur"><i class="fas fa-arrows-alt-h"></i> Motion</button><button class="effect-chip" data-effect="zoomBlur"><i class="fas fa-search-plus"></i> Zoom</button><button class="effect-chip" data-effect="gaussianBlur"><i class="fas fa-water"></i> Gaussian</button></div>`,
         'Advanced': slider('blur','Blur Amount',0,20,'px') + slider('bokeh','Bokeh',0,80)
       },
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     portrait: {
-      title: 'Portrait',
-      tabs: ['Skin', 'Features'],
+      title: 'Portrait', tabs: ['Skin', 'Features'],
       content: {
         'Skin': slider('skin','Skin Smooth',0,100) + slider('glow','Glow',0,100),
         'Features': slider('teeth','Teeth White',0,100) + slider('eyes','Eye Brighten',0,100) + slider('faceSlim','Face Slim',0,100)
@@ -719,198 +600,115 @@ function buildPanels() {
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="resetToolBtn">Reset</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     retouch: {
-      title: 'Retouch',
-      tabs: ['Heal','Smooth'],
-      content: {
-        'Heal': `<div class="effects-grid"><button class="effect-chip" data-effect="heal"><i class="fas fa-band-aid"></i> Heal Area</button></div>`,
-        'Smooth': slider('skin','Smooth Strength',0,100)
-      },
+      title: 'Retouch', tabs: ['Heal','Smooth'],
+      content: { 'Heal': `<div class="effects-grid"><button class="effect-chip" data-effect="heal"><i class="fas fa-band-aid"></i> Heal Area</button></div>`, 'Smooth': slider('skin','Smooth Strength',0,100) },
       footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="applyToolBtn">Apply</button>`
     },
     removebg: {
-      title: 'AI Remove Background',
-      tabs: [],
-      content: `
-        <div style="text-align:center;padding:20px;">
-          <i class="fas fa-robot" style="font-size:4rem;color:#8b5cf6;margin-bottom:20px;"></i>
-          <h3 style="margin-bottom:10px;">AI Background Remover</h3>
-          <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:20px;">Works best with people photos</p>
-          <button class="btn-check" id="aiBgBtn" style="padding:15px 30px;font-size:1rem;"><i class="fas fa-magic"></i> Remove Background</button>
-        </div>
-      `,
+      title: 'AI Remove Background', tabs: [],
+      content: `<div style="text-align:center;padding:20px;"><i class="fas fa-robot" style="font-size:4rem;color:#8b5cf6;margin-bottom:20px;"></i><h3 style="margin-bottom:10px;">AI Background Remover</h3><p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:20px;">Works best with people photos</p><button class="btn-check" id="aiBgBtn" style="padding:15px 30px;font-size:1rem;"><i class="fas fa-magic"></i> Remove Background</button></div>`,
       footer: ''
     },
     aiEnhance: {
-      title: 'AI Enhance',
-      tabs: [],
-      content: `
-        <div style="text-align:center;padding:20px;">
-          <i class="fas fa-wand-magic-sparkles" style="font-size:4rem;color:#06b6d4;margin-bottom:20px;"></i>
-          <h3 style="margin-bottom:10px;">One-Tap AI Enhance</h3>
-          <p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:20px;">Auto-adjust for perfect balance</p>
-          <button class="btn-check" id="aiEnhanceBtn" style="padding:15px 30px;font-size:1rem;"><i class="fas fa-magic"></i> Enhance Now</button>
-        </div>
-      `,
+      title: 'AI Enhance', tabs: [],
+      content: `<div style="text-align:center;padding:20px;"><i class="fas fa-wand-magic-sparkles" style="font-size:4rem;color:#06b6d4;margin-bottom:20px;"></i><h3 style="margin-bottom:10px;">One-Tap AI Enhance</h3><p style="color:#a0a0b0;font-size:0.85rem;margin-bottom:20px;">Auto-adjust for perfect balance</p><button class="btn-check" id="aiEnhanceBtn" style="padding:15px 30px;font-size:1rem;"><i class="fas fa-magic"></i> Enhance Now</button></div>`,
       footer: ''
     },
     sky: {
-      title: 'Sky Replacement',
-      tabs: [],
-      content: `
-        <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Apply sky overlay (tap to try)</p>
-        <div class="effects-grid">
-          <button class="effect-chip" data-sky="sunset"><i class="fas fa-sun"></i> Sunset</button>
-          <button class="effect-chip" data-sky="night"><i class="fas fa-moon"></i> Night</button>
-          <button class="effect-chip" data-sky="storm"><i class="fas fa-bolt"></i> Storm</button>
-          <button class="effect-chip" data-sky="aurora"><i class="fas fa-star"></i> Aurora</button>
-          <button class="effect-chip" data-sky="clouds"><i class="fas fa-cloud"></i> Clouds</button>
-          <button class="effect-chip" data-sky="warm"><i class="fas fa-sun"></i> Warm</button>
-        </div>
-      `,
+      title: 'Sky Replacement', tabs: [],
+      content: `<p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Apply sky overlay</p><div class="effects-grid"><button class="effect-chip" data-sky="sunset"><i class="fas fa-sun"></i> Sunset</button><button class="effect-chip" data-sky="night"><i class="fas fa-moon"></i> Night</button><button class="effect-chip" data-sky="storm"><i class="fas fa-bolt"></i> Storm</button><button class="effect-chip" data-sky="aurora"><i class="fas fa-star"></i> Aurora</button><button class="effect-chip" data-sky="clouds"><i class="fas fa-cloud"></i> Clouds</button><button class="effect-chip" data-sky="warm"><i class="fas fa-sun"></i> Warm</button></div>`,
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     draw: {
-      title: 'Draw',
-      tabs: ['Brush','Neon','Eraser'],
+      title: 'Draw', tabs: ['Brush','Neon','Eraser'],
       content: {
-        'Brush': `
-          <div class="slider-group"><label><span>Size</span><span id="brushSizeVal">15px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div>
-          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Color:</p>
-          <div class="effects-grid">
-            <button class="effect-chip draw-color" data-color="#ff0066" style="background:#ff0066;">●</button>
-            <button class="effect-chip draw-color" data-color="#ffffff" style="background:#fff;color:#000;">●</button>
-            <button class="effect-chip draw-color" data-color="#06b6d4" style="background:#06b6d4;">●</button>
-            <button class="effect-chip draw-color" data-color="#8b5cf6" style="background:#8b5cf6;">●</button>
-            <button class="effect-chip draw-color" data-color="#10b981" style="background:#10b981;">●</button>
-            <button class="effect-chip draw-color" data-color="#f59e0b" style="background:#f59e0b;">●</button>
-          </div>
-        `,
+        'Brush': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">15px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div><p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Color:</p><div class="effects-grid"><button class="effect-chip draw-color" data-color="#ff0066" style="background:#ff0066;">●</button><button class="effect-chip draw-color" data-color="#ffffff" style="background:#fff;color:#000;">●</button><button class="effect-chip draw-color" data-color="#06b6d4" style="background:#06b6d4;">●</button><button class="effect-chip draw-color" data-color="#8b5cf6" style="background:#8b5cf6;">●</button><button class="effect-chip draw-color" data-color="#10b981" style="background:#10b981;">●</button><button class="effect-chip draw-color" data-color="#f59e0b" style="background:#f59e0b;">●</button></div>`,
         'Neon': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">20px</span></label><input type="range" id="brushSize" min="1" max="100" value="20"></div><p style="font-size:0.75rem;color:var(--text-dim);">Neon glow brush - draw on canvas</p>`,
         'Eraser': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">30px</span></label><input type="range" id="brushSize" min="1" max="100" value="30"></div><p style="font-size:0.75rem;color:var(--text-dim);">Eraser removes drawing layer</p>`
       },
       footer: `<button class="btn-cancel" id="clearDrawBtn">Clear</button><button class="btn-check" id="mergeDrawBtn">Merge</button>`
     },
     text: {
-      title: 'Add Text',
-      tabs: [],
-      content: `
-        <input type="text" id="textInput" placeholder="Enter text..." style="width:100%;padding:12px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;font-family:inherit;">
-        <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;margin-bottom:12px;">
-          <input type="color" id="textColor" value="#ffffff" style="height:42px;padding:3px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;">
-          <input type="range" id="textSize" min="10" max="200" value="48">
-          <select id="textFont" style="padding:10px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;">
-            <option value="Poppins">Poppins</option>
-            <option value="Orbitron">Orbitron</option>
-            <option value="Playfair Display">Playfair</option>
-            <option value="Arial">Arial</option>
-            <option value="Georgia">Georgia</option>
-          </select>
-        </div>
-      `,
-      footer: `<button class="btn-check" id="addTextBtn" style="flex:1"><i class="fas fa-plus"></i> Add Text</button>`
+      title: 'Text — 20+ Styles', tabs: ['Style','Content'],
+      content: {
+        'Style': `
+          <div class="text-preview-box">
+            <div id="textPreview" style="font-size:1.5rem;font-weight:700;font-family:Poppins,sans-serif;">AVR TECH LABS</div>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">✨ Choose a style (24 styles available):</p>
+          <div class="text-style-grid" id="textStyleGrid"></div>
+        `,
+        'Content': `
+          <input type="text" id="textInput" placeholder="Enter your text..." value="AVR TECH LABS" style="width:100%;padding:12px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;font-family:inherit;">
+          <div class="slider-group"><label><span>Size</span><span id="textSizeVal">64px</span></label><input type="range" id="textSize" min="10" max="200" value="64"></div>
+          <div class="panel-actions-row">
+            <button class="action-btn" id="textPosTL"><i class="fas fa-arrow-up-left"></i> Top Left</button>
+            <button class="action-btn" id="textPosTR"><i class="fas fa-arrow-up-right"></i> Top Right</button>
+            <button class="action-btn" id="textPosCenter"><i class="fas fa-circle"></i> Center</button>
+            <button class="action-btn" id="textPosBL"><i class="fas fa-arrow-down-left"></i> Bottom Left</button>
+            <button class="action-btn" id="textPosBR"><i class="fas fa-arrow-down-right"></i> Bottom Right</button>
+            <button class="action-btn" id="textPosBottom"><i class="fas fa-arrow-down"></i> Bottom Center</button>
+          </div>
+          <div class="slider-group" style="margin-top:12px;"><label><span>Opacity</span><span id="textOpacityVal">100%</span></label><input type="range" id="textOpacity" min="10" max="100" value="100"></div>
+        `
+      },
+      footer: `<button class="btn-cancel" id="cancelToolBtn">Cancel</button><button class="btn-check" id="addTextBtn" style="flex:2"><i class="fas fa-plus"></i> Add Text</button>`
     },
     sticker: {
-      title: 'Stickers',
-      tabs: ['Emojis','Shapes'],
-      content: {
-        'Emojis': `<div class="effects-grid" id="emojiGrid"></div>`,
-        'Shapes': `<div class="effects-grid" id="shapeGrid"></div>`
-      },
+      title: 'Stickers', tabs: ['Emojis','Shapes'],
+      content: { 'Emojis': `<div class="effects-grid" id="emojiGrid"></div>`, 'Shapes': `<div class="effects-grid" id="shapeGrid"></div>` },
       footer: ''
     },
     frame: {
-      title: 'Frames',
-      tabs: [],
+      title: 'Frames', tabs: [],
       content: `<div class="effects-grid" id="frameGrid"></div>`,
       footer: ''
     },
     shadow: {
-      title: 'Shadow',
-      tabs: [],
-      content: `
-        <div class="effects-grid">
-          <button class="effect-chip" data-shadow="drop"><i class="fas fa-clone"></i> Drop Shadow</button>
-          <button class="effect-chip" data-shadow="glow"><i class="fas fa-sun"></i> Glow</button>
-          <button class="effect-chip" data-shadow="outline"><i class="fas fa-square"></i> Outline</button>
-          <button class="effect-chip" data-shadow="inner"><i class="fas fa-circle"></i> Inner</button>
-        </div>
-      `,
+      title: 'Shadow', tabs: [],
+      content: `<div class="effects-grid"><button class="effect-chip" data-shadow="drop"><i class="fas fa-clone"></i> Drop Shadow</button><button class="effect-chip" data-shadow="glow"><i class="fas fa-sun"></i> Glow</button><button class="effect-chip" data-shadow="outline"><i class="fas fa-square"></i> Outline</button><button class="effect-chip" data-shadow="inner"><i class="fas fa-circle"></i> Inner</button></div>`,
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Done</button>`
     },
     collage: {
-      title: 'Collage',
-      tabs: [],
-      content: `
-        <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Apply collage layout to current image</p>
-        <div class="collage-grids">
-          <div class="collage-opt" data-layout="2x1"><div></div><div></div></div>
-          <div class="collage-opt" data-layout="1x2"><div></div><div></div></div>
-          <div class="collage-opt" data-layout="2x2"><div></div><div></div><div></div><div></div></div>
-          <div class="collage-opt" data-layout="3x1"><div></div><div></div><div></div></div>
-          <div class="collage-opt" data-layout="1x3"><div></div><div></div><div></div></div>
-          <div class="collage-opt" data-layout="3x3"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-        </div>
-      `,
+      title: 'Collage', tabs: [],
+      content: `<p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Apply collage layout</p><div class="collage-grids"><div class="collage-opt" data-layout="2x1"><div></div><div></div></div><div class="collage-opt" data-layout="1x2"><div></div><div></div></div><div class="collage-opt" data-layout="2x2"><div></div><div></div><div></div><div></div></div><div class="collage-opt" data-layout="3x1"><div></div><div></div><div></div></div><div class="collage-opt" data-layout="1x3"><div></div><div></div><div></div></div><div class="collage-opt" data-layout="3x3"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>`,
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1">Apply</button>`
     },
     watermark: {
-      title: 'Watermark',
-      tabs: [],
-      content: `
-        <input type="text" id="wmText" placeholder="Your watermark text..." value="© AVR PHOTO EDITS" style="width:100%;padding:12px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;font-family:inherit;">
-        <div class="slider-group"><label><span>Size</span><span id="wmSizeVal">36px</span></label><input type="range" id="wmSize" min="10" max="100" value="36"></div>
-        <div class="slider-group"><label><span>Opacity</span><span id="wmOpacityVal">40%</span></label><input type="range" id="wmOpacity" min="10" max="100" value="40"></div>
-        <select id="wmPos" style="width:100%;padding:10px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;">
-          <option value="br">Bottom Right</option>
-          <option value="bl">Bottom Left</option>
-          <option value="tr">Top Right</option>
-          <option value="tl">Top Left</option>
-          <option value="c">Center</option>
-        </select>
-      `,
+      title: 'Watermark', tabs: [],
+      content: `<input type="text" id="wmText" placeholder="Your watermark text..." value="© AVR TECH LABS" style="width:100%;padding:12px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;font-family:inherit;"><div class="slider-group"><label><span>Size</span><span id="wmSizeVal">36px</span></label><input type="range" id="wmSize" min="10" max="100" value="36"></div><div class="slider-group"><label><span>Opacity</span><span id="wmOpacityVal">40%</span></label><input type="range" id="wmOpacity" min="10" max="100" value="40"></div><select id="wmPos" style="width:100%;padding:10px;background:#1c1c2a;border:1px solid #2a2a3a;border-radius:10px;color:white;margin-bottom:10px;"><option value="br">Bottom Right</option><option value="bl">Bottom Left</option><option value="tr">Top Right</option><option value="tl">Top Left</option><option value="c">Center</option></select>`,
       footer: `<button class="btn-check" id="applyWmBtn" style="flex:1"><i class="fas fa-check"></i> Apply Watermark</button>`
     },
     export: {
-      title: 'Export',
-      tabs: [],
-      content: `
-        <div class="slider-group"><label><span>Quality</span><span id="qualityVal">95%</span></label><input type="range" id="quality" min="10" max="100" value="95"></div>
-        <div class="panel-actions-row">
-          <button class="action-btn" id="exportPNG"><i class="fas fa-file-image"></i> PNG</button>
-          <button class="action-btn" id="exportJPG"><i class="fas fa-file-image"></i> JPG</button>
-        </div>
-      `,
+      title: 'Export', tabs: [],
+      content: `<div class="slider-group"><label><span>Quality</span><span id="qualityVal">95%</span></label><input type="range" id="quality" min="10" max="100" value="95"></div><div class="panel-actions-row"><button class="action-btn" id="exportPNG"><i class="fas fa-file-image"></i> PNG</button><button class="action-btn" id="exportJPG"><i class="fas fa-file-image"></i> JPG</button></div>`,
       footer: `<button class="btn-check" id="applyToolBtn" style="flex:1"><i class="fas fa-download"></i> Download</button>`
     }
   };
 }
 
-/* -------------------- PANEL HANDLERS -------------------- */
 function attachPanelHandlers(tool, activeTab) {
-  // Sliders
   document.querySelectorAll('#panelContent input[type="range"]').forEach(input => {
     const id = input.id;
-    if (['brushSize','textSize','quality','wmSize','wmOpacity'].includes(id)) {
+    if (['brushSize','textSize','quality','wmSize','wmOpacity','textOpacity'].includes(id)) {
       const valId = id + 'Val';
       const label = document.getElementById(valId);
-      const suffix = id === 'wmSize' ? 'px' : (id === 'wmOpacity' ? '%' : (id === 'brushSize' ? 'px' : ''));
+      const suffix = id === 'wmSize' ? 'px' : (id === 'wmOpacity' || id === 'textOpacity' ? '%' : (id === 'brushSize' ? 'px' : (id === 'textSize' ? 'px' : '')));
       input.addEventListener('input', e => {
         if (label) label.textContent = e.target.value + suffix;
         if (id === 'brushSize') state.drawSize = +e.target.value;
+        if (id === 'textSize') {
+          const preview = document.getElementById('textPreview');
+          if (preview) preview.style.fontSize = (e.target.value / 40) + 'rem';
+        }
       });
       return;
-    }
-    // Perspective specific
-    if (id.startsWith('perspTl') || id.startsWith('perspTr') || id.startsWith('perspBl') || id.startsWith('perspBr')) {
-      return; // handled below
     }
     const valId = id + 'Val';
     const label = document.getElementById(valId);
     const suffix = id === 'hue' ? '°' : (id === 'blur' ? 'px' : (['brightness','contrast','saturation','gamma'].includes(id) ? '%' : ''));
-    
     input.value = state.filters[id] !== undefined ? state.filters[id] : input.value;
     if (label) label.textContent = input.value + suffix;
-    
     input.addEventListener('input', e => {
       const val = parseFloat(e.target.value);
       state.filters[id] = val;
@@ -920,7 +718,6 @@ function attachPanelHandlers(tool, activeTab) {
     input.addEventListener('change', () => saveHistory());
   });
 
-  // Crop
   if (tool === 'crop') {
     document.querySelectorAll('.ratio-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -951,44 +748,34 @@ function attachPanelHandlers(tool, activeTab) {
     document.getElementById('applyCropBtn')?.addEventListener('click', applyCrop);
   }
 
-  // Perspective
   if (tool === 'perspective') {
     ['perspTl','perspTr','perspBl','perspBr'].forEach(id => {
       const input = document.getElementById(id);
       const label = document.getElementById(id + 'Val');
       if (input) {
         input.addEventListener('input', e => {
-          const val = +e.target.value;
-          if (label) label.textContent = val;
-          state.perspective[id.replace('persp','').toLowerCase()] = val;
+          if (label) label.textContent = e.target.value;
+          state.perspective[id.replace('persp','').toLowerCase()] = +e.target.value;
         });
       }
     });
     document.getElementById('applyPerspBtn')?.addEventListener('click', applyPerspective);
   }
 
-  // Filters
   if (tool === 'filters') {
     const cat = activeTab ? activeTab.toLowerCase() : 'all';
     buildFilterPreviews(cat);
   }
 
-  // Effects
   document.querySelectorAll('.effect-chip[data-effect]').forEach(btn => {
     btn.addEventListener('click', () => applySpecialEffect(btn.dataset.effect));
   });
-
-  // Sky
   document.querySelectorAll('.effect-chip[data-sky]').forEach(btn => {
     btn.addEventListener('click', () => applySky(btn.dataset.sky));
   });
-
-  // Shadow
   document.querySelectorAll('.effect-chip[data-shadow]').forEach(btn => {
     btn.addEventListener('click', () => applyShadow(btn.dataset.shadow));
   });
-
-  // Collage
   document.querySelectorAll('.collage-opt').forEach(opt => {
     opt.addEventListener('click', () => {
       document.querySelectorAll('.collage-opt').forEach(o => o.classList.remove('active'));
@@ -996,7 +783,6 @@ function attachPanelHandlers(tool, activeTab) {
     });
   });
 
-  // Draw colors
   document.querySelectorAll('.draw-color').forEach(btn => {
     btn.addEventListener('click', () => {
       state.drawColor = btn.dataset.color;
@@ -1006,56 +792,68 @@ function attachPanelHandlers(tool, activeTab) {
     });
   });
 
-  // Draw activation
   if (tool === 'draw') {
     drawLayer.width = canvas.width;
     drawLayer.height = canvas.height;
     drawLayer.classList.add('active');
     drawLayer.style.opacity = '1';
     state.currentTool = 'draw';
-
     document.getElementById('clearDrawBtn')?.addEventListener('click', () => {
       dctx.clearRect(0, 0, drawLayer.width, drawLayer.height);
     });
     document.getElementById('mergeDrawBtn')?.addEventListener('click', mergeDrawLayer);
   }
 
-  // Curve
-  if (tool === 'curve') {
-    setupCurveEditor();
+  if (tool === 'curve') setupCurveEditor();
+
+  // TEXT panel
+  if (tool === 'text') {
+    // Build text style grid
+    const grid = document.getElementById('textStyleGrid');
+    if (grid) {
+      grid.innerHTML = '';
+      TEXT_STYLES.forEach(style => {
+        const chip = document.createElement('button');
+        chip.className = 'text-style-chip ' + style.cls + (state.selectedTextStyle === style.id ? ' active' : '');
+        chip.textContent = style.name;
+        chip.style.fontFamily = style.font;
+        chip.addEventListener('click', () => {
+          state.selectedTextStyle = style.id;
+          document.querySelectorAll('.text-style-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          updateTextPreview(style);
+        });
+        grid.appendChild(chip);
+      });
+      // Set initial preview
+      const current = TEXT_STYLES.find(s => s.id === state.selectedTextStyle);
+      if (current) updateTextPreview(current);
+    }
+
+    // Position buttons
+    const positions = {
+      textPosTL: {x: 0.05, y: 0.1, align: 'left'},
+      textPosTR: {x: 0.95, y: 0.1, align: 'right'},
+      textPosCenter: {x: 0.5, y: 0.5, align: 'center'},
+      textPosBL: {x: 0.05, y: 0.9, align: 'left'},
+      textPosBR: {x: 0.95, y: 0.9, align: 'right'},
+      textPosBottom: {x: 0.5, y: 0.9, align: 'center'}
+    };
+    Object.keys(positions).forEach(id => {
+      document.getElementById(id)?.addEventListener('click', () => {
+        window._textPos = positions[id];
+        showToast('Position set');
+      });
+    });
+
+    document.getElementById('addTextBtn')?.addEventListener('click', addStyledText);
   }
 
-  // Stickers
   if (tool === 'sticker') buildStickers();
-
-  // Frame
   if (tool === 'frame') buildFrames();
-
-  // AI BG
   document.getElementById('aiBgBtn')?.addEventListener('click', removeBackgroundAI);
   document.getElementById('aiEnhanceBtn')?.addEventListener('click', aiEnhance);
 
-  // Text
-  document.getElementById('addTextBtn')?.addEventListener('click', () => {
-    const text = document.getElementById('textInput')?.value;
-    if (!text) return showToast('Enter text!');
-    const color = document.getElementById('textColor').value;
-    const size = document.getElementById('textSize').value;
-    const font = document.getElementById('textFont').value;
-    ctx.font = `bold ${size}px ${font}, sans-serif`;
-    ctx.fillStyle = color;
-    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-    ctx.lineWidth = 3;
-    ctx.textAlign = 'center';
-    ctx.strokeText(text, canvas.width/2, canvas.height/2);
-    ctx.fillText(text, canvas.width/2, canvas.height/2);
-    bakeToOriginal();
-    saveHistory();
-    closePanel();
-    showToast('Text added ✍️');
-  });
-
-  // Watermark
   document.getElementById('applyWmBtn')?.addEventListener('click', () => {
     const text = document.getElementById('wmText').value;
     const size = +document.getElementById('wmSize').value;
@@ -1079,23 +877,16 @@ function attachPanelHandlers(tool, activeTab) {
     ctx.strokeText(text, x, y);
     ctx.fillText(text, x, y);
     ctx.restore();
-    bakeToOriginal();
-    saveHistory();
-    closePanel();
-    showToast('Watermark applied');
+    bakeToOriginal(); saveHistory(); closePanel(); showToast('Watermark applied');
   });
 
-  // Export
   document.getElementById('exportPNG')?.addEventListener('click', () => downloadImage('png'));
   document.getElementById('exportJPG')?.addEventListener('click', () => downloadImage('jpg'));
 
-  // Apply / Reset / Cancel
   document.getElementById('applyToolBtn')?.addEventListener('click', () => {
     if (tool === 'export') return downloadImage('png');
     if (tool === 'draw') return mergeDrawLayer();
-    saveHistory();
-    closePanel();
-    showToast('Applied ✓');
+    saveHistory(); closePanel(); showToast('Applied ✓');
   });
   document.getElementById('resetToolBtn')?.addEventListener('click', () => {
     Object.keys(state.filters).forEach(k => {
@@ -1103,14 +894,154 @@ function attachPanelHandlers(tool, activeTab) {
       else if (k === 'whitePoint') state.filters[k] = 255;
       else state.filters[k] = 0;
     });
-    applyFilters();
-    closePanel();
-    showToast('Reset ⟲');
+    applyFilters(); closePanel(); showToast('Reset ⟲');
   });
   document.getElementById('cancelToolBtn')?.addEventListener('click', closePanel);
 }
 
-/* -------------------- FILTER PREVIEWS -------------------- */
+function updateTextPreview(style) {
+  const preview = document.getElementById('textPreview');
+  if (!preview) return;
+  preview.style.cssText = 'font-size:1.5rem;font-weight:700;';
+  preview.style.fontFamily = style.font + ', sans-serif';
+  preview.style.background = 'none';
+  preview.style.webkitBackgroundClip = 'initial';
+  preview.style.webkitTextFillColor = style.fill || '#fff';
+  preview.style.color = style.fill || '#fff';
+  preview.style.textShadow = 'none';
+  preview.style.webkitTextStroke = '0';
+
+  if (style.glow) preview.style.textShadow = `0 0 8px ${style.glow}, 0 0 16px ${style.glow}, 0 0 24px ${style.glow}`;
+  if (style.stroke) preview.style.webkitTextStroke = `2px ${style.stroke}`;
+  if (style.strokeColor) preview.style.webkitTextStroke = `${style.strokeWidth || 2}px ${style.strokeColor}`;
+  if (style.shadow) preview.style.textShadow = '4px 4px 8px rgba(0,0,0,0.8)';
+  if (style.three_d) preview.style.textShadow = '2px 2px 0 #8b5cf6, 4px 4px 0 #ec4899, 6px 6px 0 #06b6d4';
+  if (style.offsetShadow) preview.style.textShadow = '-3px 3px 0 #8b5cf6';
+  if (style.emboss) preview.style.textShadow = '1px 1px 0 #fff, -1px -1px 0 #000';
+  if (style.gradient) {
+    const grads = {
+      gold: 'linear-gradient(135deg, #f5e6b8, #d4af37, #b8941f, #d4af37)',
+      fire: 'linear-gradient(180deg, #ff4500, #ff8c00, #ffd700)',
+      ice: 'linear-gradient(180deg, #a0f0ff, #fff, #a0f0ff)',
+      'red-fire': 'linear-gradient(180deg, #ffeb3b, #ff9800, #f44336, #b71c1c)'
+    };
+    preview.style.background = grads[style.id] || grads.gold;
+    preview.style.webkitBackgroundClip = 'text';
+    preview.style.backgroundClip = 'text';
+    preview.style.webkitTextFillColor = 'transparent';
+    preview.style.color = 'transparent';
+  }
+  if (style.rainbow) {
+    preview.style.background = 'linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff)';
+    preview.style.webkitBackgroundClip = 'text';
+    preview.style.backgroundClip = 'text';
+    preview.style.webkitTextFillColor = 'transparent';
+    preview.style.backgroundSize = '200% 100%';
+    preview.style.animation = 'rainbowShift 3s linear infinite';
+  }
+}
+
+function addStyledText() {
+  if (!originalImage) return showToast('Upload image first!');
+  const text = document.getElementById('textInput')?.value;
+  if (!text) return showToast('Enter text!');
+  const size = +document.getElementById('textSize').value;
+  const opacity = +document.getElementById('textOpacity').value / 100;
+  const style = TEXT_STYLES.find(s => s.id === state.selectedTextStyle) || TEXT_STYLES[0];
+  const pos = window._textPos || {x: 0.5, y: 0.5, align: 'center'};
+
+  const x = canvas.width * pos.x;
+  const y = canvas.height * pos.y;
+
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.font = `bold ${size}px ${style.font}, sans-serif`;
+  ctx.textAlign = pos.align;
+  ctx.textBaseline = 'middle';
+
+  // Gradient fills
+  if (style.gradient) {
+    const grads = {
+      gold: ['#f5e6b8', '#d4af37', '#b8941f', '#d4af37'],
+      fire: ['#ff4500', '#ff8c00', '#ffd700'],
+      ice: ['#a0f0ff', '#ffffff', '#a0f0ff'],
+      'red-fire': ['#ffeb3b', '#ff9800', '#f44336', '#b71c1c']
+    };
+    const colors = grads[style.id] || grads.gold;
+    const grad = ctx.createLinearGradient(x, y - size/2, x, y + size/2);
+    colors.forEach((c, i) => grad.addColorStop(i / (colors.length - 1), c));
+    ctx.fillStyle = grad;
+  }
+  // Rainbow fill
+  else if (style.rainbow) {
+    const grad = ctx.createLinearGradient(x - size * text.length / 4, y, x + size * text.length / 4, y);
+    ['#ff0000','#ff8800','#ffff00','#00ff00','#0088ff','#8800ff','#ff00ff'].forEach((c, i) => grad.addColorStop(i/6, c));
+    ctx.fillStyle = grad;
+  }
+  else {
+    ctx.fillStyle = style.fill || '#fff';
+  }
+
+  // Glow / shadow
+  if (style.glow) {
+    ctx.shadowColor = style.glow;
+    ctx.shadowBlur = 20;
+    ctx.fillText(text, x, y);
+    ctx.shadowBlur = 0;
+  }
+  if (style.shadow) {
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+  }
+  if (style.three_d) {
+    ctx.save();
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillText(text, x + 2, y + 2);
+    ctx.fillStyle = '#ec4899';
+    ctx.fillText(text, x + 4, y + 4);
+    ctx.fillStyle = '#06b6d4';
+    ctx.fillText(text, x + 6, y + 6);
+    ctx.restore();
+  }
+  if (style.offsetShadow) {
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillText(text, x - 3, y + 3);
+    ctx.fillStyle = style.fill || '#fff';
+  }
+  if (style.emboss) {
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.fillText(text, x + 1, y + 1);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(text, x - 1, y - 1);
+    ctx.restore();
+    ctx.fillStyle = style.fill || '#b0b0b0';
+  }
+
+  // Stroke
+  if (style.stroke) {
+    ctx.strokeStyle = style.stroke;
+    ctx.lineWidth = 2;
+    ctx.strokeText(text, x, y);
+  }
+  if (style.strokeColor) {
+    ctx.strokeStyle = style.strokeColor;
+    ctx.lineWidth = style.strokeWidth || 2;
+    ctx.strokeText(text, x, y);
+  }
+
+  // Main fill
+  ctx.fillText(text, x, y);
+  ctx.restore();
+
+  bakeToOriginal();
+  saveHistory();
+  closePanel();
+  showToast('Text added ✍️');
+}
+
 function buildFilterPreviews(cat = 'all') {
   const grid = document.getElementById('filterGrid');
   if (!grid) return;
@@ -1137,17 +1068,14 @@ function buildFilterPreviews(cat = 'all') {
       document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
       state.currentFilter = name;
-      applyFilters();
-      saveHistory();
+      applyFilters(); saveHistory();
       showToast(`Filter: ${label.textContent}`);
     });
     grid.appendChild(item);
   });
 }
 
-/* -------------------- STICKERS -------------------- */
 const EMOJIS = ['😀','😎','🤩','😍','🥰','😂','🤣','😇','🥳','😜','🤔','😴','😢','😡','🤯','😱','🥺','😈','👻','💀','🤖','🌟','⭐','✨','💫','🌈','❤️','💖','💝','💘','🔥','💯','🎉','🎊','🎈','🎁','🌸','🌺','🌻','🌹','🍕','🍔','🍟','☕','🍺','🎵','🎸','🎬','⚡','💎','👑','🎯','🏆','📸'];
-
 const SHAPES = ['⬛','⬜','🟥','🟦','🟩','🟨','🟪','🟧','⚫','⚪','🔴','🔵','🟢','🟡','🟣','🟠','❤️','💛','💚','💙','💜','🧡','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝'];
 
 function buildStickers() {
@@ -1182,22 +1110,14 @@ function addSticker(s) {
   ctx.font = `${Math.min(canvas.width, canvas.height) * 0.15}px serif`;
   ctx.textAlign = 'center';
   ctx.fillText(s, canvas.width/2 + (Math.random()-0.5)*canvas.width*0.5, canvas.height/2 + (Math.random()-0.5)*canvas.height*0.5);
-  bakeToOriginal();
-  saveHistory();
-  closePanel();
-  showToast('Sticker added');
+  bakeToOriginal(); saveHistory(); closePanel(); showToast('Sticker added');
 }
 
-/* -------------------- FRAMES -------------------- */
 const FRAMES = [
-  { name: 'White', style: 'white' },
-  { name: 'Black', style: 'black' },
-  { name: 'Gold', style: 'gold' },
-  { name: 'Neon', style: 'neon' },
-  { name: 'Polaroid', style: 'polaroid' },
-  { name: 'Shadow', style: 'shadow' },
-  { name: 'Vintage', style: 'vintage' },
-  { name: 'Double', style: 'double' }
+  { name: 'White', style: 'white' }, { name: 'Black', style: 'black' },
+  { name: 'Gold', style: 'gold' }, { name: 'Neon', style: 'neon' },
+  { name: 'Polaroid', style: 'polaroid' }, { name: 'Shadow', style: 'shadow' },
+  { name: 'Vintage', style: 'vintage' }, { name: 'Double', style: 'double' }
 ];
 
 function buildFrames() {
@@ -1210,9 +1130,7 @@ function buildFrames() {
     btn.innerHTML = `<i class="fas fa-square"></i> ${fr.name}`;
     btn.addEventListener('click', () => {
       if (!originalImage) return showToast('Upload image first!');
-      applyFrame(fr.style);
-      saveHistory();
-      showToast(`Frame: ${fr.name} 🖼️`);
+      applyFrame(fr.style); saveHistory(); showToast(`Frame: ${fr.name} 🖼️`);
     });
     grid.appendChild(btn);
   });
@@ -1250,7 +1168,6 @@ function applyFrame(style) {
   bakeToOriginal();
 }
 
-/* -------------------- BAKING -------------------- */
 function bakeToOriginal() {
   const snap = document.createElement('canvas');
   snap.width = canvas.width; snap.height = canvas.height;
@@ -1264,7 +1181,6 @@ function bakeToOriginal() {
   img.src = snap.toDataURL();
 }
 
-/* -------------------- SPECIAL EFFECTS -------------------- */
 function applySpecialEffect(effect) {
   if (!originalImage) return showToast('Upload image first!');
   const w = canvas.width, h = canvas.height;
@@ -1278,22 +1194,15 @@ function applySpecialEffect(effect) {
   }
   else if (effect === 'snow') {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-    for (let i = 0; i < 300; i++) {
-      ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, Math.random()*3+1, 0, Math.PI*2); ctx.fill();
-    }
+    for (let i = 0; i < 300; i++) { ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, Math.random()*3+1, 0, Math.PI*2); ctx.fill(); }
   }
   else if (effect === 'confetti') {
     const c = ['#ff0066', '#ffcc00', '#00ffcc', '#8b5cf6', '#ec4899', '#06b6d4'];
-    for (let i = 0; i < 250; i++) {
-      ctx.fillStyle = c[Math.floor(Math.random()*c.length)];
-      ctx.fillRect(Math.random()*w, Math.random()*h, 6, 10);
-    }
+    for (let i = 0; i < 250; i++) { ctx.fillStyle = c[Math.floor(Math.random()*c.length)]; ctx.fillRect(Math.random()*w, Math.random()*h, 6, 10); }
   }
   else if (effect === 'fire') {
     const g = ctx.createRadialGradient(w/2, h, 0, w/2, h, h*0.8);
-    g.addColorStop(0, 'rgba(255, 200, 50, 0.7)');
-    g.addColorStop(0.5, 'rgba(255, 100, 20, 0.5)');
-    g.addColorStop(1, 'rgba(255, 30, 0, 0)');
+    g.addColorStop(0, 'rgba(255, 200, 50, 0.7)'); g.addColorStop(0.5, 'rgba(255, 100, 20, 0.5)'); g.addColorStop(1, 'rgba(255, 30, 0, 0)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'sparkle') {
@@ -1301,27 +1210,22 @@ function applySpecialEffect(effect) {
       const x = Math.random()*w, y = Math.random()*h, s = Math.random()*8+4;
       ctx.fillStyle = `rgba(255, 255, 255, ${Math.random()*0.8+0.2})`;
       ctx.beginPath();
-      ctx.moveTo(x, y-s); ctx.lineTo(x+s/3, y-s/3); ctx.lineTo(x+s, y);
-      ctx.lineTo(x+s/3, y+s/3); ctx.lineTo(x, y+s); ctx.lineTo(x-s/3, y+s/3);
-      ctx.lineTo(x-s, y); ctx.lineTo(x-s/3, y-s/3); ctx.closePath(); ctx.fill();
+      ctx.moveTo(x, y-s); ctx.lineTo(x+s/3, y-s/3); ctx.lineTo(x+s, y); ctx.lineTo(x+s/3, y+s/3);
+      ctx.lineTo(x, y+s); ctx.lineTo(x-s/3, y+s/3); ctx.lineTo(x-s, y); ctx.lineTo(x-s/3, y-s/3); ctx.closePath(); ctx.fill();
     }
   }
   else if (effect === 'fog') {
     for (let i = 0; i < 20; i++) {
       const x = Math.random()*w, y = Math.random()*h, r = Math.random()*200+100;
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, 'rgba(220, 220, 230, 0.15)');
-      g.addColorStop(1, 'rgba(220, 220, 230, 0)');
+      g.addColorStop(0, 'rgba(220, 220, 230, 0.15)'); g.addColorStop(1, 'rgba(220, 220, 230, 0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
     }
   }
   else if (effect === 'glitch') {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
+    const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data;
     for (let i = 0; i < d.length; i += 4) {
-      if (Math.random() < 0.005) {
-        d[i] = 255 - d[i]; d[i+1] = 255 - d[i+1];
-      }
+      if (Math.random() < 0.005) { d[i] = 255 - d[i]; d[i+1] = 255 - d[i+1]; }
     }
     ctx.putImageData(imgData, 0, 0);
   }
@@ -1346,8 +1250,7 @@ function applySpecialEffect(effect) {
     ctx.filter = 'none'; ctx.globalAlpha = 1;
   }
   else if (effect === 'vhs') {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
+    const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data;
     for (let y = 0; y < h; y += 3) {
       if (Math.random() > 0.85) {
         const shift = Math.floor((Math.random() - 0.5) * 30);
@@ -1361,24 +1264,16 @@ function applySpecialEffect(effect) {
     ctx.putImageData(imgData, 0, 0);
   }
   else if (effect === 'sketch') {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
+    const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data;
     for (let i = 0; i < d.length; i += 4) {
       const lum = 0.3*d[i] + 0.59*d[i+1] + 0.11*d[i+2];
       const v = lum > 128 ? 255 : 0;
       d[i] = d[i+1] = d[i+2] = v;
     }
     ctx.putImageData(imgData, 0, 0);
-    ctx.globalCompositeOperation = 'difference';
-    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.filter = 'blur(0.5px)';
-    ctx.drawImage(canvas, 0, 0);
-    ctx.filter = 'none';
   }
   else if (effect === 'cartoon') {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
+    const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data;
     for (let i = 0; i < d.length; i += 4) {
       d[i] = Math.round(d[i] / 32) * 32;
       d[i+1] = Math.round(d[i+1] / 32) * 32;
@@ -1399,34 +1294,25 @@ function applySpecialEffect(effect) {
   else if (effect === 'sunrays') {
     const cx = w*0.7, cy = 0;
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, w);
-    g.addColorStop(0, 'rgba(255, 240, 180, 0.6)');
-    g.addColorStop(0.3, 'rgba(255, 220, 100, 0.3)');
-    g.addColorStop(1, 'rgba(255, 200, 50, 0)');
+    g.addColorStop(0, 'rgba(255, 240, 180, 0.6)'); g.addColorStop(0.3, 'rgba(255, 220, 100, 0.3)'); g.addColorStop(1, 'rgba(255, 200, 50, 0)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < 10; i++) {
       const angle = (Math.PI/5)*i + 0.3;
       ctx.strokeStyle = `rgba(255, 240, 180, ${0.3+Math.random()*0.2})`;
       ctx.lineWidth = Math.random()*30+20;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + Math.cos(angle)*w*1.5, cy + Math.sin(angle)*w*1.5);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(angle)*w*1.5, cy + Math.sin(angle)*w*1.5); ctx.stroke();
     }
     ctx.restore();
   }
   else if (effect === 'spotlight') {
     const g = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)*0.6);
-    g.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
-    g.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
-    g.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+    g.addColorStop(0, 'rgba(255, 255, 255, 0.4)'); g.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)'); g.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'rainbow') {
     const g = ctx.createLinearGradient(0, 0, w, h);
-    const cols = ['rgba(255,0,0,0.15)','rgba(255,165,0,0.15)','rgba(255,255,0,0.15)','rgba(0,255,0,0.15)','rgba(0,127,255,0.15)','rgba(75,0,130,0.15)','rgba(148,0,211,0.15)'];
-    cols.forEach((c, i) => g.addColorStop(i/(cols.length-1), c));
+    ['rgba(255,0,0,0.15)','rgba(255,165,0,0.15)','rgba(255,255,0,0.15)','rgba(0,255,0,0.15)','rgba(0,127,255,0.15)','rgba(75,0,130,0.15)','rgba(148,0,211,0.15)'].forEach((c, i) => g.addColorStop(i/6, c));
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'stars') {
@@ -1447,26 +1333,18 @@ function applySpecialEffect(effect) {
   }
   else if (effect === 'lightLeak') {
     const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, 'rgba(255,100,50,0.4)');
-    g.addColorStop(0.5, 'rgba(255,100,50,0)');
-    g.addColorStop(1, 'rgba(100,200,255,0.4)');
+    g.addColorStop(0, 'rgba(255,100,50,0.4)'); g.addColorStop(0.5, 'rgba(255,100,50,0)'); g.addColorStop(1, 'rgba(100,200,255,0.4)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'lensFlare') {
     const g = ctx.createRadialGradient(w*0.8, h*0.3, 0, w*0.8, h*0.3, w*0.4);
-    g.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-    g.addColorStop(0.2, 'rgba(255, 240, 200, 0.5)');
-    g.addColorStop(0.5, 'rgba(255, 200, 100, 0.2)');
-    g.addColorStop(1, 'rgba(255, 150, 50, 0)');
+    g.addColorStop(0, 'rgba(255, 255, 255, 0.9)'); g.addColorStop(0.2, 'rgba(255, 240, 200, 0.5)');
+    g.addColorStop(0.5, 'rgba(255, 200, 100, 0.2)'); g.addColorStop(1, 'rgba(255, 150, 50, 0)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
   else if (effect === 'grainOld') {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const n = (Math.random() - 0.5) * 50;
-      d[i] += n; d[i+1] += n; d[i+2] += n;
-    }
+    const imgData = ctx.getImageData(0, 0, w, h); const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 50; d[i] += n; d[i+1] += n; d[i+2] += n; }
     ctx.putImageData(imgData, 0, 0);
   }
   else if (effect === 'scratch') {
@@ -1474,20 +1352,11 @@ function applySpecialEffect(effect) {
     for (let i = 0; i < 15; i++) {
       ctx.lineWidth = Math.random() * 2;
       const x = Math.random() * w;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.bezierCurveTo(x+20, h/3, x-20, h*2/3, x+10, h);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.bezierCurveTo(x+20, h/3, x-20, h*2/3, x+10, h); ctx.stroke();
     }
   }
-  else if (effect === 'faded') {
-    Object.assign(state.filters, { contrast: 85, brightness: 110, saturation: 70, sepia: 15 });
-    applyFilters();
-  }
-  else if (effect === 'sepiaTone') {
-    Object.assign(state.filters, { sepia: 70, contrast: 110 });
-    applyFilters();
-  }
+  else if (effect === 'faded') { Object.assign(state.filters, { contrast: 85, brightness: 110, saturation: 70, sepia: 15 }); applyFilters(); }
+  else if (effect === 'sepiaTone') { Object.assign(state.filters, { sepia: 70, contrast: 110 }); applyFilters(); }
   else if (effect === 'dustSpots') {
     for (let i = 0; i < 200; i++) {
       ctx.fillStyle = `rgba(${Math.random()*255},${Math.random()*200},${Math.random()*100},${Math.random()*0.5})`;
@@ -1495,33 +1364,24 @@ function applySpecialEffect(effect) {
     }
   }
   else if (effect === 'tiltShift') {
-    ctx.save();
-    ctx.filter = 'blur(6px)';
+    ctx.save(); ctx.filter = 'blur(6px)';
     ctx.drawImage(canvas, 0, 0, w, h*0.25, 0, 0, w, h*0.25);
     ctx.drawImage(canvas, 0, h*0.75, w, h*0.25, 0, h*0.75, w, h*0.25);
     ctx.restore();
   }
   else if (effect === 'radialBlur') {
-    ctx.save();
-    ctx.filter = 'blur(4px)';
-    for (let i = 1; i < 8; i++) {
-      ctx.globalAlpha = 0.15;
-      ctx.drawImage(canvas, w/2 - (w/2)*i/8, h/2 - (h/2)*i/8, w*i/8, h*i/8, 0, 0, w, h);
-    }
+    ctx.save(); ctx.filter = 'blur(4px)';
+    for (let i = 1; i < 8; i++) { ctx.globalAlpha = 0.15; ctx.drawImage(canvas, w/2 - (w/2)*i/8, h/2 - (h/2)*i/8, w*i/8, h*i/8, 0, 0, w, h); }
     ctx.restore();
   }
   else if (effect === 'motionBlur') {
-    ctx.save();
-    ctx.globalAlpha = 0.3;
+    ctx.save(); ctx.globalAlpha = 0.3;
     for (let i = 1; i < 10; i++) ctx.drawImage(canvas, i*3, 0);
     ctx.restore();
   }
   else if (effect === 'zoomBlur') {
-    ctx.save();
-    ctx.globalAlpha = 0.2;
-    for (let i = 1; i < 8; i++) {
-      ctx.drawImage(canvas, w*0.1*i, h*0.1*i, w - w*0.2*i, h - h*0.2*i, 0, 0, w, h);
-    }
+    ctx.save(); ctx.globalAlpha = 0.2;
+    for (let i = 1; i < 8; i++) ctx.drawImage(canvas, w*0.1*i, h*0.1*i, w - w*0.2*i, h - h*0.2*i, 0, 0, w, h);
     ctx.restore();
   }
   else if (effect === 'gaussianBlur') {
@@ -1534,13 +1394,10 @@ function applySpecialEffect(effect) {
     ctx.filter = 'none';
   }
   else if (effect === 'heal') {
-    showToast('Heal: tap on a spot (simple clone)');
-    // simple clone - copy a patch nearby
+    showToast('Heal: random clone applied');
     if (canvas.width > 50 && canvas.height > 50) {
-      const sx = Math.random() * (w - 40);
-      const sy = Math.random() * (h - 40);
-      const dx = Math.random() * (w - 40);
-      const dy = Math.random() * (h - 40);
+      const sx = Math.random() * (w - 40), sy = Math.random() * (h - 40);
+      const dx = Math.random() * (w - 40), dy = Math.random() * (h - 40);
       const patch = ctx.getImageData(sx, sy, 40, 40);
       ctx.putImageData(patch, dx, dy);
     }
@@ -1550,7 +1407,6 @@ function applySpecialEffect(effect) {
   showToast(`${effect} applied ✨`);
 }
 
-/* -------------------- SKY REPLACEMENT -------------------- */
 function applySky(theme) {
   if (!originalImage) return showToast('Upload image first!');
   const w = canvas.width, h = canvas.height;
@@ -1568,92 +1424,60 @@ function applySky(theme) {
   const cols = themes[theme] || themes.warm;
   cols.forEach((c, i) => g.addColorStop(i/(cols.length-1), c));
   ctx.globalAlpha = 0.4;
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   ctx.restore();
   saveHistory();
   showToast(`Sky: ${theme}`);
 }
 
-/* -------------------- SHADOW EFFECTS -------------------- */
 function applyShadow(type) {
   if (!originalImage) return showToast('Upload image first!');
   const w = canvas.width, h = canvas.height;
   if (type === 'drop') {
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur = 40; ctx.shadowOffsetX = 10; ctx.shadowOffsetY = 20;
-    ctx.drawImage(canvas, 0, 0);
-    ctx.restore();
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 40; ctx.shadowOffsetX = 10; ctx.shadowOffsetY = 20;
+    ctx.drawImage(canvas, 0, 0); ctx.restore();
   } else if (type === 'glow') {
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.filter = 'blur(20px) brightness(1.5)';
-    ctx.globalAlpha = 0.5;
-    ctx.drawImage(canvas, 0, 0);
-    ctx.restore();
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.filter = 'blur(20px) brightness(1.5)';
+    ctx.globalAlpha = 0.5; ctx.drawImage(canvas, 0, 0); ctx.restore();
     ctx.filter = 'none';
   } else if (type === 'outline') {
-    ctx.save();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 6;
-    ctx.strokeRect(10, 10, w-20, h-20);
-    ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.strokeRect(10, 10, w-20, h-20); ctx.restore();
   } else if (type === 'inner') {
     const g = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)*0.3, w/2, h/2, Math.max(w,h)*0.7);
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(1, 'rgba(0,0,0,0.8)');
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.8)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   }
-  bakeToOriginal();
-  saveHistory();
+  bakeToOriginal(); saveHistory();
   showToast(`Shadow: ${type}`);
 }
 
-/* -------------------- DRAW LAYER -------------------- */
-let drawing = false;
-let lastX = 0, lastY = 0;
-
+let drawing = false, lastX = 0, lastY = 0;
 function getCanvasPoint(e) {
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
+  const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  return {
-    x: (clientX - rect.left) * scaleX,
-    y: (clientY - rect.top) * scaleY
-  };
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
 }
-
 function startDraw(e) {
   if (state.currentTool !== 'draw') return;
-  e.preventDefault();
-  drawing = true;
-  const p = getCanvasPoint(e);
-  lastX = p.x; lastY = p.y;
-  drawLayer.width = canvas.width;
-  drawLayer.height = canvas.height;
-  dctx.lineCap = 'round';
-  dctx.lineJoin = 'round';
+  e.preventDefault(); drawing = true;
+  const p = getCanvasPoint(e); lastX = p.x; lastY = p.y;
+  drawLayer.width = canvas.width; drawLayer.height = canvas.height;
+  dctx.lineCap = 'round'; dctx.lineJoin = 'round';
   dctx.strokeStyle = state.drawColor;
   dctx.lineWidth = state.drawSize;
   dctx.shadowColor = state.drawColor;
   dctx.shadowBlur = state.drawSize / 2;
 }
-
 function moveDraw(e) {
   if (!drawing) return;
   e.preventDefault();
   const p = getCanvasPoint(e);
-  dctx.beginPath();
-  dctx.moveTo(lastX, lastY);
-  dctx.lineTo(p.x, p.y);
-  dctx.stroke();
+  dctx.beginPath(); dctx.moveTo(lastX, lastY); dctx.lineTo(p.x, p.y); dctx.stroke();
   lastX = p.x; lastY = p.y;
 }
-
 function endDraw() { drawing = false; }
-
 canvas.addEventListener('pointerdown', startDraw);
 canvas.addEventListener('pointermove', moveDraw);
 canvas.addEventListener('pointerup', endDraw);
@@ -1668,32 +1492,24 @@ function mergeDrawLayer() {
     dctx.clearRect(0, 0, drawLayer.width, drawLayer.height);
     drawLayer.classList.remove('active');
     drawLayer.style.opacity = '0';
-    bakeToOriginal();
-    saveHistory();
+    bakeToOriginal(); saveHistory();
     showToast('Drawing merged ✓');
   }
   closePanel();
 }
 
-/* -------------------- CURVE EDITOR -------------------- */
 let curveCanvasEl, curveCtx, draggingPoint = null;
-
 function setupCurveEditor() {
   curveCanvasEl = document.getElementById('curveCanvas');
   if (!curveCanvasEl) return;
   curveCtx = curveCanvasEl.getContext('2d');
   drawCurve();
-  
   const getPoint = e => {
     const rect = curveCanvasEl.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)),
-      y: Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
-    };
+    return { x: Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)), y: Math.max(0, Math.min(1, (clientY - rect.top) / rect.height)) };
   };
-  
   const findClosest = pt => {
     let closest = null, minDist = 0.05;
     state.curvePoints.forEach((p, i) => {
@@ -1702,64 +1518,49 @@ function setupCurveEditor() {
     });
     return closest;
   };
-  
   const onDown = e => {
     e.preventDefault();
     const pt = getPoint(e);
     const idx = findClosest(pt);
-    if (idx !== null) {
-      draggingPoint = idx;
-    } else {
+    if (idx !== null) draggingPoint = idx;
+    else {
       state.curvePoints.push({ x: pt.x, y: pt.y });
       state.curvePoints.sort((a,b) => a.x - b.x);
       draggingPoint = state.curvePoints.findIndex(p => p.x === pt.x && p.y === pt.y);
-      drawCurve();
-      applyFilters();
+      drawCurve(); applyFilters();
     }
   };
-  
   const onMove = e => {
     if (draggingPoint === null) return;
     e.preventDefault();
     const pt = getPoint(e);
     state.curvePoints[draggingPoint] = { x: pt.x, y: pt.y };
-    drawCurve();
-    applyFilters();
+    drawCurve(); applyFilters();
   };
-  
   const onUp = () => { if (draggingPoint !== null) { draggingPoint = null; saveHistory(); } };
-  
   curveCanvasEl.addEventListener('pointerdown', onDown);
   curveCanvasEl.addEventListener('pointermove', onMove);
   curveCanvasEl.addEventListener('pointerup', onUp);
   curveCanvasEl.addEventListener('pointerleave', onUp);
-  
   document.getElementById('curveResetBtn')?.addEventListener('click', () => {
     state.curvePoints = [{x: 0, y: 1}, {x: 1, y: 0}];
-    drawCurve();
-    applyFilters();
+    drawCurve(); applyFilters();
   });
 }
-
 function drawCurve() {
   if (!curveCtx || !curveCanvasEl) return;
   const w = curveCanvasEl.width, h = curveCanvasEl.height;
   curveCtx.clearRect(0, 0, w, h);
   curveCtx.fillStyle = '#1c1c2a';
   curveCtx.fillRect(0, 0, w, h);
-  // Grid
   curveCtx.strokeStyle = 'rgba(255,255,255,0.1)';
   curveCtx.lineWidth = 1;
   for (let i = 1; i < 4; i++) {
-    curveCtx.beginPath();
-    curveCtx.moveTo(0, (h/4)*i); curveCtx.lineTo(w, (h/4)*i); curveCtx.stroke();
-    curveCtx.beginPath();
-    curveCtx.moveTo((w/4)*i, 0); curveCtx.lineTo((w/4)*i, h); curveCtx.stroke();
+    curveCtx.beginPath(); curveCtx.moveTo(0, (h/4)*i); curveCtx.lineTo(w, (h/4)*i); curveCtx.stroke();
+    curveCtx.beginPath(); curveCtx.moveTo((w/4)*i, 0); curveCtx.lineTo((w/4)*i, h); curveCtx.stroke();
   }
-  // Curve
   const pts = state.curvePoints.slice().sort((a,b) => a.x - b.x);
-  curveCtx.strokeStyle = '#8b5cf6';
-  curveCtx.lineWidth = 2;
+  curveCtx.strokeStyle = '#8b5cf6'; curveCtx.lineWidth = 2;
   curveCtx.beginPath();
   for (let i = 0; i < w; i++) {
     const t = i / w;
@@ -1772,24 +1573,26 @@ function drawCurve() {
       }
     }
     const py = h - y * h;
-    if (i === 0) curveCtx.moveTo(i, py);
-    else curveCtx.lineTo(i, py);
+    if (i === 0) curveCtx.moveTo(i, py); else curveCtx.lineTo(i, py);
   }
   curveCtx.stroke();
-  // Points
   pts.forEach(p => {
     curveCtx.fillStyle = '#ec4899';
-    curveCtx.beginPath();
-    curveCtx.arc(p.x * w, p.y * h, 6, 0, Math.PI*2);
-    curveCtx.fill();
-    curveCtx.strokeStyle = '#fff';
-    curveCtx.lineWidth = 2;
-    curveCtx.stroke();
+    curveCtx.beginPath(); curveCtx.arc(p.x * w, p.y * h, 6, 0, Math.PI*2); curveCtx.fill();
+    curveCtx.strokeStyle = '#fff'; curveCtx.lineWidth = 2; curveCtx.stroke();
   });
 }
 
-/* -------------------- CROP -------------------- */
-let cropState = { active: false, x: 0, y: 0, w: 0, h: 0, ratio: 'free', dragging: false, startX: 0, startY: 0 };
+/* ========== CROP with RESIZE HANDLES ========== */
+let cropState = {
+  active: false,
+  x: 0, y: 0, w: 0, h: 0,
+  ratio: 'free',
+  mode: null,
+  handleSize: 24,
+  startX: 0, startY: 0,
+  initial: null
+};
 
 function startCrop(ratio) {
   cropState.ratio = ratio || 'free';
@@ -1815,57 +1618,150 @@ function startCrop(ratio) {
 function drawCropOverlay() {
   const overlay = document.getElementById('cropOverlay');
   const octx = overlay.getContext('2d');
+  const { x, y, w, h, handleSize: hs } = cropState;
   octx.clearRect(0, 0, overlay.width, overlay.height);
   octx.fillStyle = 'rgba(0,0,0,0.6)';
   octx.fillRect(0, 0, overlay.width, overlay.height);
-  octx.clearRect(cropState.x, cropState.y, cropState.w, cropState.h);
+  octx.clearRect(x, y, w, h);
   octx.strokeStyle = '#8b5cf6';
   octx.lineWidth = 3;
-  octx.strokeRect(cropState.x, cropState.y, cropState.w, cropState.h);
+  octx.strokeRect(x, y, w, h);
+  // Rule-of-thirds grid
   octx.strokeStyle = 'rgba(255,255,255,0.4)';
   octx.lineWidth = 1;
   for (let i = 1; i < 3; i++) {
-    octx.beginPath();
-    octx.moveTo(cropState.x + (cropState.w/3)*i, cropState.y);
-    octx.lineTo(cropState.x + (cropState.w/3)*i, cropState.y + cropState.h);
-    octx.stroke();
-    octx.beginPath();
-    octx.moveTo(cropState.x, cropState.y + (cropState.h/3)*i);
-    octx.lineTo(cropState.x + cropState.w, cropState.y + (cropState.h/3)*i);
-    octx.stroke();
+    octx.beginPath(); octx.moveTo(x + (w/3)*i, y); octx.lineTo(x + (w/3)*i, y + h); octx.stroke();
+    octx.beginPath(); octx.moveTo(x, y + (h/3)*i); octx.lineTo(x + w, y + (h/3)*i); octx.stroke();
   }
-  // Corner handles
-  octx.fillStyle = '#8b5cf6';
-  const hs = 10;
-  octx.fillRect(cropState.x - hs/2, cropState.y - hs/2, hs, hs);
-  octx.fillRect(cropState.x + cropState.w - hs/2, cropState.y - hs/2, hs, hs);
-  octx.fillRect(cropState.x - hs/2, cropState.y + cropState.h - hs/2, hs, hs);
-  octx.fillRect(cropState.x + cropState.w - hs/2, cropState.y + cropState.h - hs/2, hs, hs);
+  // 8 handles: 4 corners + 4 edges
+  const handles = [
+    { x: x, y: y, type: 'tl' },
+    { x: x + w/2, y: y, type: 'tc' },
+    { x: x + w, y: y, type: 'tr' },
+    { x: x + w, y: y + h/2, type: 'rc' },
+    { x: x + w, y: y + h, type: 'br' },
+    { x: x + w/2, y: y + h, type: 'bc' },
+    { x: x, y: y + h, type: 'bl' },
+    { x: x, y: y + h/2, type: 'lc' }
+  ];
+  handles.forEach(hnd => {
+    // Draw handle box
+    octx.fillStyle = '#fff';
+    octx.fillRect(hnd.x - hs/2, hnd.y - hs/2, hs, hs);
+    octx.strokeStyle = '#8b5cf6';
+    octx.lineWidth = 3;
+    octx.strokeRect(hnd.x - hs/2, hnd.y - hs/2, hs, hs);
+    // Draw inner dot
+    octx.fillStyle = '#8b5cf6';
+    octx.beginPath();
+    octx.arc(hnd.x, hnd.y, hs/6, 0, Math.PI*2);
+    octx.fill();
+  });
+}
+
+function getOverlayPoint(e) {
+  const overlay = document.getElementById('cropOverlay');
+  const rect = overlay.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * (overlay.width / rect.width),
+    y: (clientY - rect.top) * (overlay.height / rect.height)
+  };
+}
+
+function hitTestHandle(px, py) {
+  const { x, y, w, h, handleSize: hs } = cropState;
+  const tolerance = hs;
+  const handles = [
+    { x: x, y: y, type: 'tl' },
+    { x: x + w/2, y: y, type: 'tc' },
+    { x: x + w, y: y, type: 'tr' },
+    { x: x + w, y: y + h/2, type: 'rc' },
+    { x: x + w, y: y + h, type: 'br' },
+    { x: x + w/2, y: y + h, type: 'bc' },
+    { x: x, y: y + h, type: 'bl' },
+    { x: x, y: y + h/2, type: 'lc' }
+  ];
+  for (const hnd of handles) {
+    if (Math.abs(px - hnd.x) < tolerance && Math.abs(py - hnd.y) < tolerance) {
+      return hnd.type;
+    }
+  }
+  return null;
 }
 
 function attachCropDrag() {
   const overlay = document.getElementById('cropOverlay');
   overlay.onpointerdown = (e) => {
-    const rect = overlay.getBoundingClientRect();
-    const px = (e.clientX - rect.left) * (overlay.width / rect.width);
-    const py = (e.clientY - rect.top) * (overlay.height / rect.height);
-    if (px >= cropState.x && px <= cropState.x + cropState.w &&
-        py >= cropState.y && py <= cropState.y + cropState.h) {
-      cropState.dragging = true;
-      cropState.startX = px - cropState.x;
-      cropState.startY = py - cropState.y;
+    e.preventDefault();
+    const pt = getOverlayPoint(e);
+    const handle = hitTestHandle(pt.x, pt.y);
+    if (handle) {
+      cropState.mode = handle;
+    } else if (pt.x >= cropState.x && pt.x <= cropState.x + cropState.w &&
+               pt.y >= cropState.y && pt.y <= cropState.y + cropState.h) {
+      cropState.mode = 'move';
+    } else {
+      return;
     }
+    cropState.startX = pt.x;
+    cropState.startY = pt.y;
+    cropState.initial = { x: cropState.x, y: cropState.y, w: cropState.w, h: cropState.h };
+    overlay.setPointerCapture(e.pointerId);
   };
   overlay.onpointermove = (e) => {
-    if (!cropState.dragging) return;
-    const rect = overlay.getBoundingClientRect();
-    const px = (e.clientX - rect.left) * (overlay.width / rect.width);
-    const py = (e.clientY - rect.top) * (overlay.height / rect.height);
-    cropState.x = Math.max(0, Math.min(overlay.width - cropState.w, px - cropState.startX));
-    cropState.y = Math.max(0, Math.min(overlay.height - cropState.h, py - cropState.startY));
+    if (!cropState.mode) return;
+    e.preventDefault();
+    const pt = getOverlayPoint(e);
+    const dx = pt.x - cropState.startX;
+    const dy = pt.y - cropState.startY;
+    const init = cropState.initial;
+    const W = overlay.width, H = overlay.height;
+    const minSize = 40;
+
+    if (cropState.mode === 'move') {
+      cropState.x = Math.max(0, Math.min(W - init.w, init.x + dx));
+      cropState.y = Math.max(0, Math.min(H - init.h, init.y + dy));
+    } else {
+      let nx = init.x, ny = init.y, nw = init.w, nh = init.h;
+      const m = cropState.mode;
+      if (m === 'tl') { nx = init.x + dx; ny = init.y + dy; nw = init.w - dx; nh = init.h - dy; }
+      else if (m === 'tc') { ny = init.y + dy; nh = init.h - dy; }
+      else if (m === 'tr') { ny = init.y + dy; nw = init.w + dx; nh = init.h - dy; }
+      else if (m === 'rc') { nw = init.w + dx; }
+      else if (m === 'br') { nw = init.w + dx; nh = init.h + dy; }
+      else if (m === 'bc') { nh = init.h + dy; }
+      else if (m === 'bl') { nx = init.x + dx; nw = init.w - dx; nh = init.h + dy; }
+      else if (m === 'lc') { nx = init.x + dx; nw = init.w - dx; }
+
+      // Min size
+      if (nw < minSize) { if (m === 'tl' || m === 'bl' || m === 'lc') nx = init.x + init.w - minSize; nw = minSize; }
+      if (nh < minSize) { if (m === 'tl' || m === 'tr' || m === 'tc') ny = init.y + init.h - minSize; nh = minSize; }
+
+      // Apply ratio constraint for corners
+      if (cropState.ratio !== 'free' && ['tl','tr','bl','br'].includes(m)) {
+        const [rw, rh] = cropState.ratio.split(':').map(Number);
+        const r = rw / rh;
+        if (nw / nh > r) nh = nw / r; else nw = nh * r;
+        if (m === 'tl') { nx = init.x + init.w - nw; ny = init.y + init.h - nh; }
+        else if (m === 'tr') { ny = init.y + init.h - nh; }
+        else if (m === 'bl') { nx = init.x + init.w - nw; }
+      }
+
+      // Clamp
+      nx = Math.max(0, nx); ny = Math.max(0, ny);
+      nw = Math.min(W - nx, nw); nh = Math.min(H - ny, nh);
+
+      cropState.x = nx; cropState.y = ny; cropState.w = nw; cropState.h = nh;
+    }
     drawCropOverlay();
   };
-  overlay.onpointerup = () => { cropState.dragging = false; };
+  overlay.onpointerup = (e) => {
+    cropState.mode = null;
+    try { overlay.releasePointerCapture(e.pointerId); } catch(err) {}
+  };
+  overlay.onpointercancel = () => { cropState.mode = null; };
 }
 
 function applyCrop() {
@@ -1881,8 +1777,7 @@ function applyCrop() {
     originalImage._scaledH = h;
     state.rotation = 0; state.flipH = false; state.flipV = false;
     canvas.width = w; canvas.height = h;
-    applyFilters();
-    saveHistory();
+    applyFilters(); saveHistory();
     document.getElementById('cropOverlay').classList.remove('active');
     cropState.active = false;
     closePanel();
@@ -1891,7 +1786,6 @@ function applyCrop() {
   img.src = temp.toDataURL();
 }
 
-/* -------------------- PERSPECTIVE -------------------- */
 function applyPerspective() {
   if (!originalImage) return showToast('Upload image first!');
   const w = canvas.width, h = canvas.height;
@@ -1900,20 +1794,16 @@ function applyPerspective() {
   temp.width = w; temp.height = h;
   temp.getContext('2d').drawImage(canvas, 0, 0);
   ctx.clearRect(0, 0, w, h);
-  // Simple skew approximation using transforms
   ctx.save();
   const skewX = (p.tl - p.tr) / 200;
   const skewY = (p.bl - p.br) / 200;
   ctx.transform(1, skewY * 0.1, skewX * 0.1, 1, 0, 0);
   ctx.drawImage(temp, 0, 0);
   ctx.restore();
-  bakeToOriginal();
-  saveHistory();
-  closePanel();
+  bakeToOriginal(); saveHistory(); closePanel();
   showToast('Perspective applied');
 }
 
-/* -------------------- AI BG -------------------- */
 async function removeBackgroundAI() {
   if (!originalImage) return showToast('Upload image first!');
   if (typeof bodyPix === 'undefined') return showToast('AI loading... wait');
@@ -1928,10 +1818,8 @@ async function removeBackgroundAI() {
       if (mask[i] === 0) d[i*4 + 3] = 0;
     }
     ctx.putImageData(imgData, 0, 0);
-    bakeToOriginal();
-    saveHistory();
-    loading.classList.remove('active');
-    closePanel();
+    bakeToOriginal(); saveHistory();
+    loading.classList.remove('active'); closePanel();
     showToast('BG removed! 🤖✨');
   } catch (err) {
     loading.classList.remove('active');
@@ -1939,13 +1827,11 @@ async function removeBackgroundAI() {
   }
 }
 
-/* -------------------- AI ENHANCE -------------------- */
 async function aiEnhance() {
   if (!originalImage) return showToast('Upload image first!');
   const loading = document.getElementById('aiLoading');
   loading.classList.add('active');
   setTimeout(() => {
-    // Analyze histogram for auto-adjust
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const d = imgData.data;
     let sum = 0, count = 0, sumSat = 0;
@@ -1961,32 +1847,22 @@ async function aiEnhance() {
     }
     const avgLum = sum / count;
     const avgSat = sumSat / count;
-    // Find percentiles
     let acc = 0, p1 = 0, p99 = 255;
     for (let i = 0; i < 256; i++) { acc += hist[i]; if (acc >= count * 0.02) { p1 = i; break; } }
     acc = 0;
     for (let i = 255; i >= 0; i--) { acc += hist[i]; if (acc >= count * 0.02) { p99 = i; break; } }
-
     Object.assign(state.filters, {
-      blackPoint: p1,
-      whitePoint: p99,
+      blackPoint: p1, whitePoint: p99,
       brightness: avgLum < 110 ? 115 : (avgLum > 150 ? 95 : 100),
-      contrast: 110,
-      saturation: avgSat < 0.3 ? 115 : 105,
-      vibrance: 20,
-      clarity: 25,
-      sharpness: 15,
-      vibrance: 25
+      contrast: 110, saturation: avgSat < 0.3 ? 115 : 105,
+      vibrance: 25, clarity: 25, sharpness: 15
     });
-    applyFilters();
-    saveHistory();
-    loading.classList.remove('active');
-    closePanel();
+    applyFilters(); saveHistory();
+    loading.classList.remove('active'); closePanel();
     showToast('AI Enhanced! ✨');
   }, 800);
 }
 
-/* -------------------- COMPARE -------------------- */
 document.getElementById('compareBtn')?.addEventListener('click', () => {
   if (!originalImage) return showToast('Upload image first!');
   state.compareMode = !state.compareMode;
@@ -1995,10 +1871,8 @@ document.getElementById('compareBtn')?.addEventListener('click', () => {
   showToast(state.compareMode ? 'Showing original' : 'Showing edited');
 });
 
-/* -------------------- DOWNLOAD / SHARE -------------------- */
 function downloadImage(format = 'png') {
   if (!originalImage) return showToast('Upload image first!');
-  // Merge draw layer if visible
   const out = document.createElement('canvas');
   out.width = canvas.width; out.height = canvas.height;
   const octx = out.getContext('2d');
@@ -2007,7 +1881,7 @@ function downloadImage(format = 'png') {
     octx.drawImage(drawLayer, 0, 0, out.width, out.height);
   }
   const link = document.createElement('a');
-  link.download = `AVR-Photo-${Date.now()}.${format}`;
+  link.download = `PROS-EDITS-${Date.now()}.${format}`;
   link.href = out.toDataURL(`image/${format}`, 0.95);
   link.click();
   showToast('Saved! 💾');
@@ -2022,16 +1896,15 @@ document.getElementById('shareBtn')?.addEventListener('click', async () => {
     out.width = canvas.width; out.height = canvas.height;
     out.getContext('2d').drawImage(canvas, 0, 0);
     const blob = await new Promise(res => out.toBlob(res, 'image/png', 1.0));
-    const file = new File([blob], 'avr-photo.png', { type: 'image/png' });
+    const file = new File([blob], 'pros-edits.png', { type: 'image/png' });
     if (navigator.share) {
-      await navigator.share({ files: [file], title: 'AVR PHOTO EDITS' });
+      await navigator.share({ files: [file], title: "PRO'S EDITS by AVR TECH LABS" });
     } else {
       showToast('Share not supported');
     }
   } catch(e) {}
 });
 
-/* -------------------- CAMERA / SOURCE -------------------- */
 const cameraModal = document.getElementById('cameraModal');
 const video = document.getElementById('video');
 let stream = null;
@@ -2084,7 +1957,6 @@ document.getElementById('fromCamera')?.addEventListener('click', () => {
   startCamera();
 });
 
-/* -------------------- KEYBOARD -------------------- */
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'z') { e.preventDefault(); doUndo(); }
   if (e.ctrlKey && e.key === 'y') { e.preventDefault(); doRedo(); }
@@ -2093,5 +1965,5 @@ document.addEventListener('keydown', (e) => {
 
 updateUndoRedoUI();
 
-console.log('%c AVR PHOTO EDITS v9.0 ULTRA ', 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 20px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
-console.log('%c 80+ Tools · All Working 🚀', 'color: #06b6d4; font-size: 14px;');
+console.log("%c PRO'S EDITS v10.0 · by AVR TECH LABS ", 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 18px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
+console.log('%c 80+ Tools · Resizable Crop · 24 Text Styles 🚀', 'color: #06b6d4; font-size: 14px;');
