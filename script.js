@@ -1670,7 +1670,7 @@ function drawCropOverlay() {
     octx.beginPath(); octx.moveTo(x + (w/3)*i, y); octx.lineTo(x + (w/3)*i, y + h); octx.stroke();
     octx.beginPath(); octx.moveTo(x, y + (h/3)*i); octx.lineTo(x + w, y + (h/3)*i); octx.stroke();
   }
-  const handles = [ { x: x, y: y, type: 'tl' }, { x: x + w/2, y: y, type: 'tc' }, { x: x + w, y: y, type: 'tr' }, { x: x + w, y: y + h/2, type: 'rc' }, { x: x + w, y: y + h, type: 'br' }, { x: x + w, y: y + h, type: 'bc' }, { x: x, y: y + h, type: 'bl' }, { x: x, y: y + h/2, type: 'lc' } ];
+  const handles = [ { x: x, y: y, type: 'tl' }, { x: x + w/2, y: y, type: 'tc' }, { x: x + w, y: y, type: 'tr' }, { x: x + w, y: y + h/2, type: 'rc' }, { x: x + w, y: y + h, type: 'br' }, { x: x + w/2, y: y + h, type: 'bc' }, { x: x, y: y + h, type: 'bl' }, { x: x, y: y + h/2, type: 'lc' } ];
   handles.forEach(hnd => {
     octx.fillStyle = '#fff'; octx.fillRect(hnd.x - hs/2, hnd.y - hs/2, hs, hs);
     octx.strokeStyle = '#8b5cf6'; octx.lineWidth = 3; octx.strokeRect(hnd.x - hs/2, hnd.y - hs/2, hs, hs);
@@ -1840,41 +1840,80 @@ document.getElementById('shareBtn')?.addEventListener('click', async () => {
   } catch(e) {}
 });
 
-const cameraModal = document.getElementById('cameraModal'); const video = document.getElementById('video'); let stream = null;
-async function startCamera() {
-  try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); video.srcObject = stream; }
-  catch (err) { showToast('Camera denied ❌'); }
-}
-document.getElementById('captureBtn')?.addEventListener('click', () => {
-  const tc = document.createElement('canvas'); tc.width = video.videoWidth; tc.height = video.videoHeight;
-  tc.getContext('2d').drawImage(video, 0, 0); loadImage(tc.toDataURL('image/png')); closeCamera();
-});
-document.getElementById('closeCamera')?.addEventListener('click', closeCamera);
-function closeCamera() { cameraModal.classList.remove('active'); if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
-document.getElementById('closeAppBtn')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.add('active'); });
-document.getElementById('dropZone')?.addEventListener('click', () => { if (!originalImage) document.getElementById('sourceModal').classList.add('active'); });
-document.getElementById('closeSource')?.addEventListener('click', () => { document.getElementById('sourceModal').classList.remove('active'); });
+const cameraModal = document.getElementById('cameraModal'); 
+const video = document.getElementById('video'); 
+let stream = null;
 
-// Android / iOS File Input Handler
+async function startCamera() {
+  try { 
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); 
+    video.srcObject = stream; 
+  } catch (err) { 
+    showToast('Camera denied ❌'); 
+  }
+}
+
+document.getElementById('captureBtn')?.addEventListener('click', () => {
+  const tc = document.createElement('canvas'); 
+  tc.width = video.videoWidth; 
+  tc.height = video.videoHeight;
+  tc.getContext('2d').drawImage(video, 0, 0); 
+  loadImage(tc.toDataURL('image/png')); 
+  closeCamera();
+});
+
+document.getElementById('closeCamera')?.addEventListener('click', closeCamera);
+function closeCamera() { 
+  cameraModal.classList.remove('active'); 
+  if (stream) { 
+    stream.getTracks().forEach(t => t.stop()); 
+    stream = null; 
+  } 
+}
+
+document.getElementById('closeAppBtn')?.addEventListener('click', () => { 
+  document.getElementById('sourceModal').classList.add('active'); 
+});
+
+document.getElementById('dropZone')?.addEventListener('click', () => { 
+  if (!originalImage) document.getElementById('sourceModal').classList.add('active'); 
+});
+
+document.getElementById('closeSource')?.addEventListener('click', () => { 
+  document.getElementById('sourceModal').classList.remove('active'); 
+});
+
+// =======================================================
+// REALME & ANDROID COMPATIBLE FILE UPLOAD HANDLER
+// =======================================================
 const hiddenInput = document.getElementById('hiddenFileInput');
+const galleryBtn = document.getElementById('fromGalleryBtn');
+
+galleryBtn?.addEventListener('click', () => {
+  document.getElementById('sourceModal')?.classList.remove('active');
+  if (hiddenInput) {
+    hiddenInput.value = '';
+    hiddenInput.click();
+  }
+});
+
 if (hiddenInput) {
   hiddenInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    document.getElementById('sourceModal').classList.remove('active');
-    if (file.size > 50 * 1024 * 1024) {
-      showToast('Photo is too large (Max 50MB)');
+
+    if (!file.type.startsWith('image/')) {
+      showToast('దయచేసి సరైన ఫోటోను ఎంచుకోండి');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      loadImage(ev.target.result);
-      hiddenInput.value = '';
-    };
-    reader.onerror = () => {
-      showToast('Failed to read file. Try another photo.');
-    };
-    reader.readAsDataURL(file);
+
+    try {
+      const blobUrl = URL.createObjectURL(file);
+      loadImage(blobUrl);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+    } catch (err) {
+      showToast('ఫోటో లోడ్ చేయడంలో ఎర్రర్ వచ్చింది');
+    }
   });
 }
 
@@ -1891,3 +1930,4 @@ document.addEventListener('keydown', (e) => {
 });
 
 updateUndoRedoUI();
+console.log("%c PRO'S EDITS v1.0 · by AVR TECH LABS ", 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 18px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
