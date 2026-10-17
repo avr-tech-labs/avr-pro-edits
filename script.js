@@ -31,6 +31,7 @@ const state = {
   compareMode: false,
   drawColor: '#ff0066',
   drawSize: 15,
+  drawMode: 'brush', // brush, neon, eraser
   selectedTextStyle: 'neon'
 };
 
@@ -497,6 +498,7 @@ function openToolPanel(tool) {
   if (!config) return;
   title.textContent = config.title;
   footer.innerHTML = config.footer || '';
+
   if (config.tabs && config.tabs.length > 0) {
     config.tabs.forEach((tabName, idx) => {
       const t = document.createElement('button');
@@ -514,9 +516,17 @@ function openToolPanel(tool) {
   } else {
     tabs.style.display = 'none';
   }
+
   content.innerHTML = typeof config.content === 'string' ? config.content : (config.content[config.tabs ? config.tabs[0] : ''] || '');
   panel.classList.add('open');
-  document.getElementById('panelOverlay').classList.add('active');
+
+  // DRAW టూల్ ఓపెన్ అయినప్పుడు నల్లటి ఓవర్‌లే టచ్‌ను బ్లాక్ చేయకుండా తీసేయాలి
+  if (tool === 'draw') {
+    document.getElementById('panelOverlay').classList.remove('active');
+  } else {
+    document.getElementById('panelOverlay').classList.add('active');
+  }
+
   setTimeout(() => attachPanelHandlers(tool, config.tabs ? config.tabs[0] : null), 100);
 }
 
@@ -687,7 +697,7 @@ function buildPanels() {
       title: 'Draw', tabs: ['Brush','Neon','Eraser'],
       content: {
         'Brush': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">15px</span></label><input type="range" id="brushSize" min="1" max="100" value="15"></div><p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Color:</p><div class="effects-grid"><button class="effect-chip draw-color" data-color="#ff0066" style="background:#ff0066;">●</button><button class="effect-chip draw-color" data-color="#ffffff" style="background:#fff;color:#000;">●</button><button class="effect-chip draw-color" data-color="#06b6d4" style="background:#06b6d4;">●</button><button class="effect-chip draw-color" data-color="#8b5cf6" style="background:#8b5cf6;">●</button><button class="effect-chip draw-color" data-color="#10b981" style="background:#10b981;">●</button><button class="effect-chip draw-color" data-color="#f59e0b" style="background:#f59e0b;">●</button></div>`,
-        'Neon': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">20px</span></label><input type="range" id="brushSize" min="1" max="100" value="20"></div><p style="font-size:0.75rem;color:var(--text-dim);">Neon glow brush - draw directly on canvas</p>`,
+        'Neon': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">20px</span></label><input type="range" id="brushSize" min="1" max="100" value="20"></div><p style="font-size:0.75rem;color:var(--text-dim);">Neon glow brush - draw directly on photo</p>`,
         'Eraser': `<div class="slider-group"><label><span>Size</span><span id="brushSizeVal">30px</span></label><input type="range" id="brushSize" min="1" max="100" value="30"></div><p style="font-size:0.75rem;color:var(--text-dim);">Eraser removes drawing strokes</p>`
       },
       footer: `<button class="btn-cancel" id="clearDrawBtn">Clear</button><button class="btn-check" id="mergeDrawBtn">Merge</button>`
@@ -854,13 +864,19 @@ function attachPanelHandlers(tool, activeTab) {
   });
 
   if (tool === 'draw') {
+    if (!originalImage) return showToast('Upload image first!');
     drawLayer.width = canvas.width;
     drawLayer.height = canvas.height;
     drawLayer.classList.add('active');
     drawLayer.style.opacity = '1';
     state.currentTool = 'draw';
+    
+    // Tab tracking
+    state.drawMode = (activeTab || 'Brush').toLowerCase();
+    
     document.getElementById('clearDrawBtn')?.addEventListener('click', () => {
       dctx.clearRect(0, 0, drawLayer.width, drawLayer.height);
+      showToast('Drawing cleared');
     });
     document.getElementById('mergeDrawBtn')?.addEventListener('click', mergeDrawLayer);
   }
@@ -1237,7 +1253,7 @@ function applyFrame(style) {
   if (style === 'polaroid2') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, newW, 70); ctx.fillRect(0, newH - 120, newW, 120); }
   if (style === 'double') { ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4; ctx.strokeRect(8, 8, newW - 16, newH - 16); }
   if (style === 'dashed') { ctx.strokeStyle = '#fff'; ctx.setLineDash([10, 10]); ctx.lineWidth = 4; ctx.strokeRect(15, 15, newW - 30, newH - 30); ctx.setLineDash([]); }
-  if (style === 'dots') { ctx.fillStyle = '#fff'; for(let i=0; i<newW; i+=20) { ctx.beginPath(); ctx.arc(i, 15, 4, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(i, newH-15, 4, 0, Math.PI*2); ctx.fill(); } for(let i=0; i<newH; i+=20) { ctx.beginPath(); ctx.arc(15, i, 4, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(newW-15, i, 4, 0, Math.PI*2); ctx.fill(); } }
+  if (style === 'dots') { ctx.fillStyle = '#fff'; for(let i=0; i<newW; i+=20) { ctx.beginPath(); ctx.arc(i, 15, 4, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(i, newH-15, 4, 0, Math.PI*2); ctx.fill(); } for(let i=0; i<newH; i+=20) { ctx.beginPath(); ctx.arc(15, i, 4, 0, Math.PI*2); ctx.fill(); } }
   if (style === 'corners') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; const s = 40; ctx.beginPath(); ctx.moveTo(15, 15+s); ctx.lineTo(15, 15); ctx.lineTo(15+s, 15); ctx.stroke(); ctx.beginPath(); ctx.moveTo(newW-15-s, 15); ctx.lineTo(newW-15, 15); ctx.lineTo(newW-15, 15+s); ctx.stroke(); ctx.beginPath(); ctx.moveTo(15, newH-15-s); ctx.lineTo(15, newH-15); ctx.lineTo(15+s, newH-15); ctx.stroke(); ctx.beginPath(); ctx.moveTo(newW-15-s, newH-15); ctx.lineTo(newW-15, newH-15); ctx.lineTo(newW-15, newH-15-s); ctx.stroke(); }
   if (style === 'film') { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, newW, 15); ctx.fillRect(0, newH-15, newW, 15); ctx.fillRect(0, 0, 15, newH); ctx.fillRect(newW-15, 0, 15, newH); ctx.fillStyle = '#fff'; for(let i=0; i<newW; i+=30) { ctx.fillRect(i, 2, 20, 10); ctx.fillRect(i, newH-12, 20, 10); } for(let i=0; i<newH; i+=30) { ctx.fillRect(2, i, 10, 20); ctx.fillRect(newW-12, i, 10, 20); } }
 
@@ -1324,7 +1340,6 @@ function applySpecialEffect(effect) {
       if (Math.random() > 0.85) {
         const shift = Math.floor((Math.random() - 0.5) * 30);
         for (let x = 0; x < w; x++) {
-          const srcX = Math.max(0, minX => minX, x + shift);
           const idx = (y*w + x)*4, sIdx = (y*w + Math.max(0, Math.min(w-1, x + shift)))*4;
           d[idx] = d[sIdx]; d[idx+1] = d[sIdx+1]; d[idx+2] = d[sIdx+2];
         }
@@ -1530,44 +1545,83 @@ function applyShadow(type) {
 }
 
 // ============================================
-// Drawing logic attached to drawLayer
+// FIXED DRAWING LOGIC (MOBILE & DESKTOP TOUCH)
 // ============================================
 let drawing = false, lastX = 0, lastY = 0;
+
 function getCanvasPoint(e, targetEl) {
   const rect = targetEl.getBoundingClientRect();
-  const scaleX = targetEl.width / rect.width, scaleY = targetEl.height / rect.height;
+  const scaleX = targetEl.width / rect.width;
+  const scaleY = targetEl.height / rect.height;
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+  return { 
+    x: (clientX - rect.left) * scaleX, 
+    y: (clientY - rect.top) * scaleY 
+  };
 }
 
 function startDraw(e) {
   if (state.currentTool !== 'draw') return;
-  e.preventDefault(); drawing = true;
-  const p = getCanvasPoint(e, drawLayer); 
-  lastX = p.x; lastY = p.y;
-  dctx.lineCap = 'round'; dctx.lineJoin = 'round';
-  dctx.strokeStyle = state.drawColor;
-  dctx.lineWidth = state.drawSize;
-  dctx.shadowColor = state.drawColor;
-  dctx.shadowBlur = state.drawSize / 2;
+  e.preventDefault();
+  drawing = true;
+  
+  if (e.pointerId && drawLayer.setPointerCapture) {
+    try { drawLayer.setPointerCapture(e.pointerId); } catch(err) {}
+  }
+
+  const p = getCanvasPoint(e, drawLayer);
+  lastX = p.x;
+  lastY = p.y;
+
+  dctx.lineCap = 'round';
+  dctx.lineJoin = 'round';
+
+  if (state.drawMode === 'eraser') {
+    dctx.globalCompositeOperation = 'destination-out';
+    dctx.lineWidth = state.drawSize;
+    dctx.shadowBlur = 0;
+  } else if (state.drawMode === 'neon') {
+    dctx.globalCompositeOperation = 'source-over';
+    dctx.strokeStyle = state.drawColor;
+    dctx.lineWidth = state.drawSize;
+    dctx.shadowColor = state.drawColor;
+    dctx.shadowBlur = state.drawSize * 1.2;
+  } else {
+    dctx.globalCompositeOperation = 'source-over';
+    dctx.strokeStyle = state.drawColor;
+    dctx.lineWidth = state.drawSize;
+    dctx.shadowBlur = 0;
+  }
 }
 
 function moveDraw(e) {
   if (!drawing) return;
   e.preventDefault();
   const p = getCanvasPoint(e, drawLayer);
-  dctx.beginPath(); dctx.moveTo(lastX, lastY); dctx.lineTo(p.x, p.y); dctx.stroke();
-  lastX = p.x; lastY = p.y;
+  
+  dctx.beginPath();
+  dctx.moveTo(lastX, lastY);
+  dctx.lineTo(p.x, p.y);
+  dctx.stroke();
+  
+  lastX = p.x;
+  lastY = p.y;
 }
 
-function endDraw() { drawing = false; }
+function endDraw(e) {
+  if (!drawing) return;
+  drawing = false;
+  if (e && e.pointerId && drawLayer.releasePointerCapture) {
+    try { drawLayer.releasePointerCapture(e.pointerId); } catch(err) {}
+  }
+}
 
 drawLayer.addEventListener('pointerdown', startDraw);
 drawLayer.addEventListener('pointermove', moveDraw);
 drawLayer.addEventListener('pointerup', endDraw);
-drawLayer.addEventListener('pointerleave', endDraw);
 drawLayer.addEventListener('pointercancel', endDraw);
+drawLayer.addEventListener('pointerleave', endDraw);
 
 function mergeDrawLayer() {
   if (drawLayer.width && drawLayer.classList.contains('active')) {
