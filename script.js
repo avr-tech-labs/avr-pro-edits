@@ -1,12 +1,12 @@
 /* ============================================
-   PRO'S EDITS — v11.0 ULTRA by AVR TECH LABS
+   PRO'S EDITS — v1.0 by AVR TECH LABS
    150+ Features, Filters, Effects & Styles
    ============================================ */
 
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('splash')?.classList.add('hide');
-    showToast("PRO'S EDITS v11.0 Ready! 🚀");
+    showToast("PRO'S EDITS v1.0 · AVR TECH LABS 🚀");
   }, 3200);
 });
 
@@ -240,7 +240,6 @@ function applyPixelEffects() {
       r += (r-avg)*a/100; g += (g-avg)*a/100; b += (b-avg)*a/100;
     }
     if (f.fade) {
-      // Fade effect (lifts blacks and reduces contrast)
       const fadeAmount = f.fade * 0.5;
       r = r + (255 - r) * (fadeAmount/100) * 0.5;
       g = g + (255 - g) * (fadeAmount/100) * 0.5;
@@ -1776,7 +1775,7 @@ function downloadImage(format = 'png') {
   const out = document.createElement('canvas'); out.width = canvas.width; out.height = canvas.height;
   const octx = out.getContext('2d'); octx.drawImage(canvas, 0, 0);
   if (drawLayer.width && drawLayer.style.opacity !== '0') { octx.drawImage(drawLayer, 0, 0, out.width, out.height); }
-  const link = document.createElement('a'); link.download = `PROS-EDITS-${Date.now()}.${format}`;
+  const link = document.createElement('a'); link.download = `PROS-EDITS-v1.0-${Date.now()}.${format}`;
   link.href = out.toDataURL(`image/${format}`, 0.95); link.click(); showToast('Saved! 💾');
 }
 
@@ -1788,7 +1787,7 @@ document.getElementById('shareBtn')?.addEventListener('click', async () => {
     out.getContext('2d').drawImage(canvas, 0, 0);
     const blob = await new Promise(res => out.toBlob(res, 'image/png', 1.0));
     const file = new File([blob], 'pros-edits.png', { type: 'image/png' });
-    if (navigator.share) { await navigator.share({ files: [file], title: "PRO'S EDITS by AVR TECH LABS" }); }
+    if (navigator.share) { await navigator.share({ files: [file], title: "PRO'S EDITS v1.0 by AVR TECH LABS" }); }
     else { showToast('Share not supported'); }
   } catch(e) {}
 });
@@ -1822,4 +1821,4 @@ document.addEventListener('keydown', (e) => {
 });
 
 updateUndoRedoUI();
-console.log("%c PRO'S EDITS v11.0 ULTRA · by AVR TECH LABS ", 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 18px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
+console.log("%c PRO'S EDITS v1.0 · by AVR TECH LABS ", 'background: linear-gradient(135deg, #6d28d9, #ec4899); color: white; font-size: 18px; padding: 10px 20px; border-radius: 8px; font-weight: bold;');
