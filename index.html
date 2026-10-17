@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0f">
-<title>AVR PHOTO EDITS — v9.0 ULTRA PRO</title>
+<title>AVR PHOTO EDITS — Pro Photo Editor</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -62,10 +62,12 @@
 <!-- Header -->
 <header class="header">
   <button class="header-btn" id="closeAppBtn" title="Add Photo"><i class="fas fa-plus"></i></button>
+  
   <div class="header-center">
     <button class="header-btn" id="undoBtn" title="Undo"><i class="fas fa-undo"></i></button>
     <button class="header-btn" id="redoBtn" title="Redo"><i class="fas fa-redo"></i></button>
   </div>
+  
   <div class="header-right">
     <button class="header-btn" id="downloadBtn" title="Save"><i class="fas fa-download"></i></button>
     <button class="header-btn" id="shareBtn" title="Share"><i class="fas fa-share-alt"></i></button>
@@ -77,12 +79,14 @@
   <div class="canvas-wrapper" id="canvasWrapper">
     <canvas id="canvas" width="800" height="500"></canvas>
     <canvas id="cropOverlay" class="crop-overlay"></canvas>
+    
     <div class="drop-zone" id="dropZone">
       <i class="fas fa-cloud-upload-alt"></i>
       <h3>Tap to Add Photo</h3>
       <p>Start editing like a pro ✨</p>
     </div>
   </div>
+  
   <div class="ai-loading" id="aiLoading">
     <div class="ai-spinner"></div>
     <p>AI Processing...</p>
@@ -90,36 +94,84 @@
   </div>
 </main>
 
-<!-- Bottom Toolbar -->
+<!-- Bottom Toolbar (Scrollable) -->
 <nav class="bottom-toolbar" id="bottomToolbar">
-  <button class="bt-btn active" data-tool="adjust"><div class="bt-icon"><i class="fas fa-sliders-h"></i></div><span>Adjust</span></button>
-  <button class="bt-btn" data-tool="crop"><div class="bt-icon"><i class="fas fa-crop-alt"></i></div><span>Crop</span></button>
-  <button class="bt-btn" data-tool="light"><div class="bt-icon"><i class="fas fa-sun"></i></div><span>Light</span></button>
-  <button class="bt-btn" data-tool="color"><div class="bt-icon"><i class="fas fa-palette"></i></div><span>Color</span></button>
-  <button class="bt-btn" data-tool="tone"><div class="bt-icon"><i class="fas fa-chart-line"></i></div><span>Tone</span></button>
-  <button class="bt-btn" data-tool="detail"><div class="bt-icon"><i class="fas fa-search-plus"></i></div><span>Detail</span></button>
-  <button class="bt-btn" data-tool="effects"><div class="bt-icon"><i class="fas fa-magic"></i><span class="dot purple"></span></div><span>Effects</span></button>
-  <button class="bt-btn" data-tool="filters"><div class="bt-icon"><i class="fas fa-filter"></i></div><span>Filters</span></button>
-  <button class="bt-btn" data-tool="vintage"><div class="bt-icon"><i class="fas fa-clock"></i></div><span>Vintage</span></button>
-  <button class="bt-btn" data-tool="splittone"><div class="bt-icon"><i class="fas fa-adjust"></i></div><span>Split Tone</span></button>
-  <button class="bt-btn" data-tool="portrait"><div class="bt-icon"><i class="fas fa-user-circle"></i></div><span>Portrait</span></button>
-  <button class="bt-btn" data-tool="retouch"><div class="bt-icon"><i class="fas fa-band-aid"></i></div><span>Retouch</span></button>
-  <button class="bt-btn" data-tool="removebg"><div class="bt-icon"><i class="fas fa-cut"></i><span class="badge">AI</span></div><span>Remove BG</span></button>
-  <button class="bt-btn" data-tool="draw"><div class="bt-icon"><i class="fas fa-paint-brush"></i></div><span>Draw</span></button>
-  <button class="bt-btn" data-tool="text"><div class="bt-icon"><i class="fas fa-font"></i></div><span>Text</span></button>
-  <button class="bt-btn" data-tool="sticker"><div class="bt-icon"><i class="fas fa-smile"></i></div><span>Sticker</span></button>
-  <button class="bt-btn" data-tool="frame"><div class="bt-icon"><i class="fas fa-square"></i></div><span>Frame</span></button>
-  <button class="bt-btn" data-tool="export"><div class="bt-icon"><i class="fas fa-file-export"></i></div><span>Export</span></button>
+  <button class="bt-btn active" data-tool="adjust">
+    <div class="bt-icon"><i class="fas fa-sliders-h"></i></div>
+    <span>Adjust</span>
+  </button>
+  <button class="bt-btn" data-tool="crop">
+    <div class="bt-icon"><i class="fas fa-crop-alt"></i></div>
+    <span>Crop</span>
+  </button>
+  <button class="bt-btn" data-tool="light">
+    <div class="bt-icon"><i class="fas fa-sun"></i></div>
+    <span>Light</span>
+  </button>
+  <button class="bt-btn" data-tool="color">
+    <div class="bt-icon"><i class="fas fa-palette"></i></div>
+    <span>Color</span>
+  </button>
+  <button class="bt-btn" data-tool="tone">
+    <div class="bt-icon"><i class="fas fa-chart-line"></i></div>
+    <span>Tone</span>
+  </button>
+  <button class="bt-btn" data-tool="detail">
+    <div class="bt-icon"><i class="fas fa-search-plus"></i></div>
+    <span>Detail</span>
+  </button>
+  <button class="bt-btn" data-tool="effects">
+    <div class="bt-icon"><i class="fas fa-magic"></i><span class="dot purple"></span></div>
+    <span>Effects</span>
+  </button>
+  <button class="bt-btn" data-tool="filters">
+    <div class="bt-icon"><i class="fas fa-filter"></i></div>
+    <span>Filters</span>
+  </button>
+  <button class="bt-btn" data-tool="portrait">
+    <div class="bt-icon"><i class="fas fa-user-circle"></i></div>
+    <span>Portrait</span>
+  </button>
+  <button class="bt-btn" data-tool="retouch">
+    <div class="bt-icon"><i class="fas fa-band-aid"></i></div>
+    <span>Retouch</span>
+  </button>
+  <button class="bt-btn" data-tool="removebg">
+    <div class="bt-icon"><i class="fas fa-cut"></i><span class="badge">AI</span></div>
+    <span>Remove BG</span>
+  </button>
+  <button class="bt-btn" data-tool="draw">
+    <div class="bt-icon"><i class="fas fa-paint-brush"></i></div>
+    <span>Draw</span>
+  </button>
+  <button class="bt-btn" data-tool="text">
+    <div class="bt-icon"><i class="fas fa-font"></i></div>
+    <span>Text</span>
+  </button>
+  <button class="bt-btn" data-tool="sticker">
+    <div class="bt-icon"><i class="fas fa-smile"></i></div>
+    <span>Sticker</span>
+  </button>
+  <button class="bt-btn" data-tool="frame">
+    <div class="bt-icon"><i class="fas fa-square"></i></div>
+    <span>Frame</span>
+  </button>
+  <button class="bt-btn" data-tool="export">
+    <div class="bt-icon"><i class="fas fa-file-export"></i></div>
+    <span>Export</span>
+  </button>
 </nav>
 
 <!-- Panel -->
 <div class="panel-overlay" id="panelOverlay"></div>
 <aside class="panel" id="panel">
   <div class="panel-handle"></div>
+  
   <div class="panel-header">
     <h3 id="panelTitle">Adjust</h3>
     <button class="panel-close-btn" id="panelClose"><i class="fas fa-times"></i></button>
   </div>
+  
   <div class="panel-tabs" id="panelTabs"></div>
   <div class="panel-content" id="panelContent"></div>
   <div class="panel-footer" id="panelFooter"></div>
@@ -145,8 +197,14 @@
   <div class="modal-content">
     <h2><i class="fas fa-plus"></i> Add Photo</h2>
     <div class="source-grid">
-      <button class="source-btn" id="fromGallery"><i class="fas fa-image"></i><span>Gallery</span></button>
-      <button class="source-btn" id="fromCamera"><i class="fas fa-camera"></i><span>Camera</span></button>
+      <button class="source-btn" id="fromGallery">
+        <i class="fas fa-image"></i>
+        <span>Gallery</span>
+      </button>
+      <button class="source-btn" id="fromCamera">
+        <i class="fas fa-camera"></i>
+        <span>Camera</span>
+      </button>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" id="closeSource">Cancel</button>
